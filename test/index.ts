@@ -125,7 +125,6 @@ describe("Verify", function () {
 
     console.log("Deployed to: ", proofverifier.address);
 
-    await proofverifier.empty_method("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37");
 
     const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
     console.log("Result: " + result);

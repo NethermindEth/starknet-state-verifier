@@ -27,10 +27,6 @@ contract StarknetVerifier {
         EdgeProof edgeProof;
     }
 
-    function empty_method(uint256 rootHash) public view {
-        console.log("empty_method rootHash: %s", rootHash);
-    }
-
     function uint256ToBinaryArray(uint256 input)
         internal
         pure
@@ -55,8 +51,6 @@ contract StarknetVerifier {
         uint256 start,
         uint256 length
     ) internal pure returns (bool) {
-        // uint256[] memory path1Array = uint256ToBinaryArray(path1);
-        // uint256[] memory path2Array = uint256ToBinaryArray(path2);
         for (uint256 i = start; i < start + length; i++) {
             if (path1Array[i] != path2Array[i]) {
                 return false;
@@ -82,7 +76,7 @@ contract StarknetVerifier {
                     proof.edgeProof.childHash,
                     proof.edgeProof.path
                 ) + uint256(proof.edgeProof.length)) %
-                3618502788666131213697322783095070105623107215331596699973092056135872020481;
+                3618502788666131213697322783095070105623107215331596699973092056135872020481; // module big prime
         }
         console.log("hashForSingleProofNode hashvalue: %s", hashvalue);
         return hashvalue;
@@ -121,11 +115,7 @@ contract StarknetVerifier {
         uint256 originalValue = fromBinaryArrayToUint(path_bits);
         console.log("verify_proof originalValue: %s", originalValue);
         require(originalValue == path, "path and paths_bits are not equal");
-        uint256 path_bits_index = 0;
-
-        for (uint256 x = 0; x < 251; x++) {
-            console.log("verify_proof path_bits[%s]: %s", x, path_bits[x]);
-        }
+        uint256 path_bits_index = path_bits.length - 1;
 
         // 1 is right
         // 0 is left
@@ -140,13 +130,13 @@ contract StarknetVerifier {
                 console.log("yaay we passed");
             }
             if (proof.nodeType == NodeType.BINARY) {
-                bool isRight = (path_bits[path_bits_index] == 1);
+                bool isRight = (path_bits[path_bits_index] == 0);
                 if (isRight == true) {
                     expectedHash = proof.binaryProof.rightHash;
                 } else {
                     expectedHash = proof.binaryProof.leftHash;
                 }
-                path_bits_index++;
+                path_bits_index--;
                 console.log(
                     "Binary",
                     proof.binaryProof.leftHash,
