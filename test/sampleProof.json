@@ -1,0 +1,144 @@
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "contract_proof": [
+            {
+                "Binary": {
+                    "left": "0x4c5c1bc7458149199d228c427404a67fecb2f70e5995485cdc0a500568a55be",
+                    "right": "0x6a846ad9a8adf19a56683d3b9cdd4798a20c5263e414a84c5373de9ea562318"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x71dd9fd64e28a350fc12f149564a2e36e189ff7ec2e419eb16fe3c440b77199",
+                    "right": "0x153a08c3c2cd1dfa26e7dd54a686ed5770016a0c8c931cbc6e1c3ed2f9a9810"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x14d02362d13391cda05cf36cfe6635de96f002342b42ac755ec517e16bcf0fc",
+                    "right": "0xecbe2ff7ef5c599c3e28ba8c61c6fafbe35fd8b1b89cf6cfe4fa9fa754bfb1"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x1e0e03d9add44d28c5a9b9c8f9697020cf0985b0b316cf7fe53b5a906ac2ac6",
+                    "right": "0x31672b35960b68a90afea58647510090a77a6165ba0bd0190093bb57730617d"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x6e5a390eebdf32c805965ff1a7d01a28e1cfae36942c2ca1d6f2f7aeab80e2c",
+                    "right": "0x3e65a03c6f7e9aee52398658d8ba9473f1694b745150decb33fa96a59372e12"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x578c11e391bbe4a272e6c1dbfb06f787420ac49579cfb20c78973ac677af33e",
+                    "right": "0x77f235847e5994e44011b0dce713adde2035c9410599aa7125e371d49af1785"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x1a66fc628a222188af1048dc719e30622a70adbc265967cf22e85e0b29d2558",
+                    "right": "0x24828478e19b79d79ab956568a22dd17f2111b80c22aa7c659bd2cbe325f215"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x324eadf16bd54dd33a7401d81ed7393be20d823ddc70a246396bea52a2d3473",
+                    "right": "0x3552114c6ab3b7e5b7921f139c623b3cd24df4b4f33824ecbca8b5e4c0650f"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x202609932d3a419ebd95178a4c4c23d06b177fc49c1be2e17f2057ecad4e726",
+                    "right": "0x721d29a3ed727524896b8c66ada124370d016f00ea686093f4658ed671ac0c8"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x41d944e73a26f70f016fc8eb7d40110c9ee02ac611e5b4817078114f23350ba",
+                    "right": "0x34df7b64c80a1a2b2ba5ef4ad2fa995fb8715515779c33fd3d0ff8dcded26fa"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x5d0fd586ca5bfa8fac0abe7e13ef614d1bc21cde394e3a5281e59f6c46051e9",
+                    "right": "0x124280265157c8bffef2c9e015c89c85f4962c06b9b5142f8c95c73692f1d9b"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x5cdb999fe49578dd5b0e65daf08a184644cc7d13397aee69b376edaeacb84e8",
+                    "right": "0xefbe33899ae2777e8604803104db70a4bb60c07709ccbe626b121648ceb34a"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x58156da1ae10113492e8f07feafbd7d073a92dde82b4fd10315275587bb77df",
+                    "right": "0x725b3f2273dc51115caf20be700459a341e1e05c551837e4222698796ab573a"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x2f858bf26ba54b1c86c56720dcdbaa084c019aa3ccd5b48dcdfc33de45f79ae",
+                    "right": "0xd5c85bdd5d77779ac5e7c3adcae10aa29d6942a6c24ef018e59325bd90e5d5"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x623c3a6ba98d308375954f939787edd4590fe8e75ff3f82607188d86f6333c4",
+                    "right": "0x533b520bcab791912049ab9e38f75671b3858a089e490c8f8c729edd9af323c"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x2b097c7fcd0a8986e61334fb71879841f1a8a1b3053d409793b5bcdaeefd4ce",
+                    "right": "0x4c0cf3533326de156aa183b368e78658d06b3ac7eb5f7ecd2a48cad09432f05"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x2b77d6443c5ead31ed3a058c4816e88eb20108f1cfae74566e27dec7ee1e824",
+                    "right": "0x740de39c75dc6b39afd1817090cc532663570f03853f6d67ae9f2d235a4fe39"
+                }
+            },
+            {
+                "Binary": {
+                    "left": "0x3932749c23da0555b3b5db6af28a736867a20172ee3e76281f832837672e423",
+                    "right": "0x5add1aefde4e95a9b4c1aa81df80ecc8a6e80d163f0f5f417045463662a5d7a"
+                }
+            },
+            {
+                "Edge": {
+                    "path": {
+                        "value": "0x60228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39",
+                        "len": 233
+                    },
+                    "child": "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f"
+                }
+            }
+        ],
+        "contract_data": {
+            "class_hash": "0x21a7f43387573b68666669a0ed764252ce5367708e696e31967764a90b429c2",
+            "nonce": "0x0",
+            "root": "0x54d89b946081c6556161b34bcd7838c501575a3e9dc3d1d38a4438107b6b8fb",
+            "contract_state_hash_version": "0x0",
+            "storage_proofs": [
+                [
+                    {
+                        "Edge": {
+                            "path": {
+                                "value": "0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091",
+                                "len": 251
+                            },
+                            "child": "0x1e240"
+                        }
+                    }
+                ]
+            ]
+        }
+    },
+    "id": 1
+}
