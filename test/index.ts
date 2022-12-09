@@ -4,7 +4,24 @@ import fs from "fs";
 import path from "path";
 import { StarknetVerifier } from '../typechain/StarknetVerifier';
 import { StarknetVerifier__factory } from "../typechain/factories/StarknetVerifier__factory";
-import { PedersenHashNaive } from "../typechain";
+import { PedersenHash, PedersenHashNaive } from "../typechain";
+import {
+  pedersen as shiftedTablesPedersen,
+  precomputes as shiftedPrecomputes,
+} from "../lib/shifted_tables";
+
+function chunk<T>(arr: T[], len: number): T[][] {
+  const chunks: T[][] = [];
+  let i = 0;
+  const n = arr.length;
+
+  while (i < n) {
+    chunks.push(arr.slice(i, (i += len)));
+  }
+
+  return chunks;
+}
+
 import {
   EventFilter,
   Signer,
@@ -32,102 +49,98 @@ interface MyStarknetProof {
   binaryProof: MyBinaryProof;
   edgeProof: MyEdgeProof;
 }
-
-
-describe("Verify", function () {
-  it("it should verify the proof", async function () {
-    var jsonFile = "./sampleProof.json";
-    console.log("Reading file: " + jsonFile);
-    var filepath = path.resolve(__dirname, jsonFile)
-    console.log("Filepath: " + filepath);
-
-    let myproofs: MyStarknetProof[] = [];
-    var originalParse = JSON.parse(fs.readFileSync(filepath, 'utf8'))
-    originalParse.result.contract_proof.forEach((element: any) => {
-      if (element.Binary != undefined) {
-        myproofs.push({
-          nodeType: 0,
-          binaryProof: {
-            leftHash: element.Binary.left,
-            rightHash: element.Binary.right
-          },
-          edgeProof: {
-            childHash: 0,
-            path: 0,
-            length: 0
-          }
-        })
-      }
-      else if (element.Edge != undefined) {
-        myproofs.push({
-          nodeType: 1,
-          binaryProof: {
-            leftHash: 0,
-            rightHash: 0
-          },
-          edgeProof: {
-            childHash: element.Edge.child,
-            path: element.Edge.path.value,
-            length: element.Edge.path.len
-          }
-        });
-      }
-    });
-
-
-    // var myproofs = JSON.parse(fs.readFileSync(filepath, 'utf8'), (key, value) => {
-    //   console.log("Key: " + key + " Value: " + value);
-    //   if (key == "Binary") {
-    //     return {
-    //       nodeType: 0,
-    //       binaryProof: {
-    //         leftHash: value.left_hash,
-    //         rightHash: value.right_hash
-    //       },
-    //       edgeProof: {
-    //         childHash: 0,
-    //         path: 0,
-    //         length: 0
-    //       }
-    //     };
-    //   }
-    //   else if (key == "Edge") {
-    //     return {
-    //       nodeType: 1,
-    //       binaryProof: {
-    //         leftHash: 0,
-    //         rightHash: 0
-    //       },
-    //       edgeProof: {
-    //         childHash: value.child_hash,
-    //         path: value.path,
-    //         length: value.length
-    //       }
-    //     };
-    //   }
-    // });
-
-    console.log("Proofs: " + myproofs.toString());
-
-    const PedersenLib = await ethers.getContractFactory("PedersenHashNaive");
-    const pedersenLib = await PedersenLib.deploy();
-    await pedersenLib.deployed();
-
-    const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier", {
-      libraries: {
-        PedersenHashNaive: pedersenLib.address,
-      }
-    },
+describe("simple table pedersen", () => {
+  let contracts: any[];
+  before(async () => {
+    const PrecomputedTableState = await ethers.getContractFactory(
+      "PrecomputedTableState"
     );
 
-    const proofverifier = await StarknetVerifier.deploy() as StarknetVerifier;
-    await proofverifier.deployed();
+    contracts = await Promise.all(
+      new Array(64).fill(0).map(async (_, i) => {
+        const contract = await PrecomputedTableState.deploy();
+        return contract;
+      })
+    );
 
-    console.log("Deployed to: ", proofverifier.address);
+    for (let i = 0; i < 64; ++i) {
+      const points = shiftedPrecomputes[i];
+
+      const toHex = (p: any) => `0x${p.toString(16)}`;
+
+      const pointsArr = points.reduce((acc: string[], p: any) => {
+        acc.push(toHex(p.getX()), toHex(p.getY()));
+        return acc;
+      }, []);
+
+      const chunks = chunk(pointsArr, 128);
+      const contract = contracts[i];
+      await Promise.all(
+        chunks.map((chunk, j) => contract.populate(chunk as any, j * 128))
+      );
+    }
+    console.log("done");
+  });
 
 
-    const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
-    console.log("Result: " + result);
+  describe("Verify", function () {
+    it("it should verify the proof", async function () {
+      var jsonFile = "./sampleProof.json";
+      console.log("Reading file: " + jsonFile);
+      var filepath = path.resolve(__dirname, jsonFile)
+      console.log("Filepath: " + filepath);
 
+      let myproofs: MyStarknetProof[] = [];
+      var originalParse = JSON.parse(fs.readFileSync(filepath, 'utf8'))
+      originalParse.result.contract_proof.forEach((element: any) => {
+        if (element.Binary != undefined) {
+          myproofs.push({
+            nodeType: 0,
+            binaryProof: {
+              leftHash: element.Binary.left,
+              rightHash: element.Binary.right
+            },
+            edgeProof: {
+              childHash: 0,
+              path: 0,
+              length: 0
+            }
+          })
+        }
+        else if (element.Edge != undefined) {
+          myproofs.push({
+            nodeType: 1,
+            binaryProof: {
+              leftHash: 0,
+              rightHash: 0
+            },
+            edgeProof: {
+              childHash: element.Edge.child,
+              path: element.Edge.path.value,
+              length: element.Edge.path.len
+            }
+          });
+        }
+      });
+
+      console.log("Proofs: " + myproofs.toString());
+
+      const PedersenHash = await ethers.getContractFactory("PedersenHash");
+      const pedersenHash = await PedersenHash.deploy(
+        contracts.map((c) => c.address)
+      );
+
+      await pedersenHash.deployed();
+
+      const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
+
+      const proofverifier = await StarknetVerifier.deploy(pedersenHash.address);
+      await proofverifier.deployed();
+
+      console.log("Deployed to: ", proofverifier.address);
+      const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
+      console.log("Result: " + result);
+
+    });
   });
 });
