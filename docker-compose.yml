@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  starknet-node:
+    image: eqlabs/pathfinder:latest
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+    env_file:
+      - .env
+    volumes:
+      - ./pathfinder:/usr/share/pathfinder/data
+    ports:
+      - 9545:9545
+  front:
+    build:
+      context: ./frontend
+      target: dev
+    env_file:
+      - ./frontend/.env
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
