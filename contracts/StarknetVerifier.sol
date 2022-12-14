@@ -10,6 +10,16 @@ contract StarknetVerifier {
         EDGE
     }
 
+    struct ContractData {
+        uint256 stateRoot;
+        uint256 contractStateRoot;
+        uint256 contractAddress;
+        uint256 storageVarAddress;
+        uint256 storageVarValue;
+        uint256 classHash;
+        uint256 hashVersion;
+        uint256 nonce;
+    }
     struct BinaryProof {
         uint256 leftHash;
         uint256 rightHash;
@@ -59,7 +69,7 @@ contract StarknetVerifier {
     }
 
     // copied and modified from https://github.com/ethereum/solidity-examples/blob/master/src/bits/Bits.sol
-    // Computes the index of the highest bit set in 'self'.
+    // Computes the index of the highest bit set in 'number'.
     // Returns the highest bit set as an 'uint'.
     // Requires that 'number != 0'.
     function highestBitSet(uint256 number)
@@ -77,6 +87,41 @@ contract StarknetVerifier {
                 val >>= i;
             }
         }
+    }
+
+    // state_hash = H(H(H(class_hash, contract_root), contract_nonce), RESERVED)
+    function stateHash(
+        uint256 classHash,
+        uint256 contractStateRoot,
+        uint256 nonce,
+        uint256 hashVersion
+    ) public view returns (uint256) {
+        uint256 contractRootClassHash = pedersen.hash(
+            classHash,
+            contractStateRoot
+        );
+        uint256 rootClassHashWithNonce = pedersen.hash(
+            contractRootClassHash,
+            nonce
+        );
+        uint256 stateHash = pedersen.hash(rootClassHashWithNonce, hashVersion);
+        return stateHash;
+    }
+
+    function verifyCompleteProof(
+        ContractData calldata contractData,
+        StarknetProof[] calldata contractProofArray,
+        StarknetProof[] calldata storageProofArray
+    ) public view returns (bool) {
+        uint256 stateHash = stateHash(
+            contractData.classHash,
+            contractData.contractStateRoot,
+            contractData.nonce,
+            contractData.hashVersion
+        );
+
+        console.log("stateHash: %s", stateHash);
+        return false;
     }
 
     function verify_proof(
@@ -131,7 +176,7 @@ contract StarknetVerifier {
                     expectedHash = proof.edgeProof.childHash;
                     console.log("expectedHash: %s", expectedHash);
                     console.log("proof.edgeProof.length: %s", length);
-                    // length - 1, because we have already progressed towrdas the LSB of the path
+                    // length - 1, because we have already progressed towards the LSB of the path
                     path_bits_index -= uint256(proof.edgeProof.length - 1);
                     console.log("path_bits_index: %s", path_bits_index);
                     console.log("expectedHash: %s", expectedHash);

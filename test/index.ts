@@ -49,6 +49,51 @@ interface MyStarknetProof {
   binaryProof: MyBinaryProof;
   edgeProof: MyEdgeProof;
 }
+
+interface MyContractData {
+  stateRoot: BigNumberish;
+  contractStateRoot: BigNumberish;
+  contractAddress: BigNumberish;
+  storageVarAddress: BigNumberish;
+  storageVarValue: BigNumberish;
+  classHash: BigNumberish;
+  hashVersion: BigNumberish;
+  nonce: BigNumberish;
+}
+
+function parseProofElement(element: any): MyStarknetProof {
+  if (element.Binary != undefined) {
+    return {
+      nodeType: 0,
+      binaryProof: {
+        leftHash: element.Binary.left,
+        rightHash: element.Binary.right,
+      },
+      edgeProof: {
+        childHash: 0,
+        path: 0,
+        length: 0,
+      },
+    };
+  } else if (element.Edge != undefined) {
+    return {
+      nodeType: 1,
+      binaryProof: {
+        leftHash: 0,
+        rightHash: 0,
+      },
+      edgeProof: {
+        childHash: element.Edge.child,
+        path: element.Edge.path.value,
+        length: element.Edge.path.len,
+      },
+    };
+  }
+  else {
+    throw new Error("Invalid proof element");
+  }
+}
+
 describe("simple table pedersen", () => {
   let contracts: any[];
   before(async () => {
@@ -90,40 +135,20 @@ describe("simple table pedersen", () => {
       var filepath = path.resolve(__dirname, jsonFile)
       console.log("Filepath: " + filepath);
 
-      let myproofs: MyStarknetProof[] = [];
+      let myContractProofs: MyStarknetProof[] = [];
+      let myStorageproofs: MyStarknetProof[] = [];
       var originalParse = JSON.parse(fs.readFileSync(filepath, 'utf8'))
+
       originalParse.result.contract_proof.forEach((element: any) => {
-        if (element.Binary != undefined) {
-          myproofs.push({
-            nodeType: 0,
-            binaryProof: {
-              leftHash: element.Binary.left,
-              rightHash: element.Binary.right
-            },
-            edgeProof: {
-              childHash: 0,
-              path: 0,
-              length: 0
-            }
-          })
-        }
-        else if (element.Edge != undefined) {
-          myproofs.push({
-            nodeType: 1,
-            binaryProof: {
-              leftHash: 0,
-              rightHash: 0
-            },
-            edgeProof: {
-              childHash: element.Edge.child,
-              path: element.Edge.path.value,
-              length: element.Edge.path.len
-            }
-          });
-        }
+        myContractProofs.push(parseProofElement(element));
       });
 
-      console.log("Proofs: " + myproofs.toString());
+      originalParse.result.contract_data.storage_proofs.forEach((element: any) => {
+        myStorageproofs.push(parseProofElement(element));
+      });
+
+      console.log("contract Proofs: " + myContractProofs.toString());
+      console.log("storage Proofs: " + myStorageproofs.toString());
 
       const PedersenHash = await ethers.getContractFactory("PedersenHash");
       const pedersenHash = await PedersenHash.deploy(
@@ -131,14 +156,31 @@ describe("simple table pedersen", () => {
       );
 
       await pedersenHash.deployed();
-
       const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
-
       const proofverifier = await StarknetVerifier.deploy(pedersenHash.address);
       await proofverifier.deployed();
 
       console.log("Deployed to: ", proofverifier.address);
-      const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
+      const starknetStateRoot = "0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37";
+      const contractAddress = "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39";
+      const storageVarAddress = "0x0206F38F7E4F15E87567361213C28F235CCCDAA1D7FD34C9DB1DFE9489C6A091";
+      const contractStateRoot = originalParse.result.contract_data.root;
+      const storageVarValue = "0x1e240";
+
+      const contractData: MyContractData = {
+        stateRoot: starknetStateRoot,
+        contractStateRoot: contractStateRoot,
+        contractAddress: contractAddress,
+        storageVarAddress: storageVarAddress,
+        storageVarValue: storageVarValue,
+        classHash: originalParse.result.contract_data.class_hash,
+        hashVersion: originalParse.result.contract_data.contract_state_hash_version,
+        nonce: originalParse.result.contract_data.nonce
+      };
+
+      const result = await proofverifier.verifyCompleteProof(contractData
+        , myContractProofs, myStorageproofs);
+      // const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myContractProofs);
       console.log("Result: " + result);
 
     });
