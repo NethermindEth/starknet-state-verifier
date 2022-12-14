@@ -7,6 +7,8 @@ import {pedersen, starknetKeccak} from "starknet/utils/hash";
 import StorageVarForm from "./StorageVarForm";
 import JsonRpcCard from "./JsonRpc/JsonRpcCard";
 import VerifyProof from "./VerifyProof";
+import Profile from "./Profile";
+
 
 const getProofMethod = {
   "name": "pathfinder_getProof",
@@ -85,6 +87,7 @@ const EnsProofCard = () => {
         <JsonRpcForm methodName={getProofMethod.name} params={getProofMethod.params as any} key={1}
                      onResult={setProof}/>
         {proof && <JsonRpcResponse data={proof}/>}
+        <Profile/>
         {proof && <VerifyProof proof={proof}/>}
       </VStack>
     </>

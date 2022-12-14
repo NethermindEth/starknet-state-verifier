@@ -23,7 +23,7 @@ const StorageVarForm = (props: Props) => {
   const computeStorageAddress = (name: string, keys: string[]) => {
     // storage_var address is the sn_keccak of the name hashed with the pedersen hash of the keys
     console.log(name, keys)
-    let res = starknetKeccak(name)
+    let res:any = starknetKeccak(name)
     keys.forEach((key) => {
       if(key==='') return;
       let felt_key = toFelt(key);

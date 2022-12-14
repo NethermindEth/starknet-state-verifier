@@ -83,6 +83,7 @@ const JsonRpcForm: React.FunctionComponent<Props> = (props: Props) => {
                   border={"1px solid #ccc"}
                   borderRadius={"4px"}
                   w={"250px"}
+                  fontSize={"12px"}
                   type="text" id={`${param.name}-value`} name={`${param.name}-value`}/>
               </HStack>
             </Flex>
