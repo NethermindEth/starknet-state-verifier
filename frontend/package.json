@@ -1,0 +1,33 @@
+{
+  "name": "starknet-ens-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "^2.0.13",
+    "@chakra-ui/react": "^2.4.3",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2",
+    "framer-motion": "^7.6.19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "starknet": "^4.9.0",
+    "wagmi": "^0.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.12",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9",
+    "@vitejs/plugin-react": "^3.0.0",
+    "bn.js": "^5.2.1",
+    "typescript": "^4.9.3",
+    "vite": "^4.0.0"
+  }
+}

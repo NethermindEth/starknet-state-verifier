@@ -7,3 +7,13 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+#frontend
+frontend/node_modules
+frontend/.env*
+
+#IDE
+.idea
+
+#Pathfinder DB (used w/ docker)
+pathfinder/

@@ -1,5 +1,6 @@
 import BN from "bn.js";
 import { sha256 } from "hash.js";
+// @ts-ignore
 import { curves as eCurves, ec as EllipticCurve } from "elliptic";
 
 import constantPointsHex from "./constant_points.json";
