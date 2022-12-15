@@ -1,10 +1,10 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
+import {expect} from "chai";
+import {ethers} from "hardhat";
 import fs from "fs";
 import path from "path";
-import { StarknetVerifier } from '../typechain/StarknetVerifier';
-import { StarknetVerifier__factory } from "../typechain/factories/StarknetVerifier__factory";
-import { PedersenHash, PedersenHashNaive } from "../typechain";
+import {StarknetVerifier} from '../typechain/StarknetVerifier';
+import {StarknetVerifier__factory} from "../typechain/factories/StarknetVerifier__factory";
+import {PedersenHash, PedersenHashNaive} from "../typechain";
 import {
   pedersen as shiftedTablesPedersen,
   precomputes as shiftedPrecomputes,
@@ -88,8 +88,7 @@ function parseProofElement(element: any): MyStarknetProof {
         length: element.Edge.path.len,
       },
     };
-  }
-  else {
+  } else {
     throw new Error("Invalid proof element");
   }
 }
@@ -120,7 +119,7 @@ describe("Verify", function () {
     const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
 
     // UPDATE THIS ADDRESS WITH THE DEPLOYED ADDRESS OF PEDERSENHASH, Run the deploy script to get the address
-    const proofverifier = await StarknetVerifier.deploy("0xc32609c91d6b6b51d48f2611308fef121b02041f");
+    const proofverifier = await StarknetVerifier.deploy("0xC32609C91d6B6b51D48f2611308FEf121B02041f");
     await proofverifier.deployed();
 
     console.log("Deployed to: ", proofverifier.address);

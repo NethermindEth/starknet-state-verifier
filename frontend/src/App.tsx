@@ -11,7 +11,7 @@ const STORAGE_HASH = starknetKeccak(STORAGE_VAR_NAME)
 
 import * as apiSpecImport from './utils/api-spec.json';
 import JsonRpcCard from "./components/JsonRpc/JsonRpcCard";
-import EnsProofCard from "./components/EnsProofCard";
+import EnsProofCard from "./components/ENS/EnsProofCard";
 
 function App() {
 
@@ -25,11 +25,12 @@ function App() {
         minW={"1000px"}
       >
         <EnsProofCard/>
-        {apiSpec.methods.map((method: { name: string; params: string[] }, index: React.Key) =>
-          <Box key={method.name}>
-            <JsonRpcCard method={method} key={index}/>
-          </Box>
-        )}
+        {/*  Not used.*/}
+        {/*{apiSpec.methods.map((method: { name: string; params: string[] }, index: React.Key) =>*/}
+        {/*  <Box key={method.name}>*/}
+        {/*    <JsonRpcCard method={method} key={index}/>*/}
+        {/*  </Box>*/}
+        {/*)}*/}
       </Flex>
     </Flex>
   )
