@@ -1,10 +1,10 @@
-import {expect} from "chai";
-import {ethers} from "hardhat";
+import { expect } from "chai";
+import { ethers } from "hardhat";
 import fs from "fs";
 import path from "path";
-import {StarknetVerifier} from '../typechain/StarknetVerifier';
-import {StarknetVerifier__factory} from "../typechain/factories/StarknetVerifier__factory";
-import {PedersenHash, PedersenHashNaive} from "../typechain";
+import { StarknetVerifier } from '../typechain/StarknetVerifier';
+import { StarknetVerifier__factory } from "../typechain/factories/StarknetVerifier__factory";
+import { PedersenHash, PedersenHashNaive } from "../typechain";
 import {
   pedersen as shiftedTablesPedersen,
   precomputes as shiftedPrecomputes,
@@ -143,11 +143,11 @@ const verify = async () => {
     console.log(e)
   }
 
-
+  console.log("PedersenHash contract has been deployed to: ", pedersenHash.address);
   let proofverifier: any;
   try {
     const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
-    proofverifier = await StarknetVerifier.deploy(pedersenHash.address );
+    proofverifier = await StarknetVerifier.deploy(pedersenHash.address);
     await proofverifier.deployed();
   } catch (e) {
     console.log(e);

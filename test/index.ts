@@ -94,95 +94,57 @@ function parseProofElement(element: any): MyStarknetProof {
   }
 }
 
-describe("simple table pedersen", () => {
-  let contracts: any[];
-  before(async () => {
-    const PrecomputedTableState = await ethers.getContractFactory(
-      "PrecomputedTableState"
-    );
 
-    contracts = await Promise.all(
-      new Array(64).fill(0).map(async (_, i) => {
-        const contract = await PrecomputedTableState.deploy();
-        return contract;
-      })
-    );
+describe("Verify", function () {
+  it("it should verify the proof", async function () {
+    var jsonFile = "./sampleProof.json";
+    console.log("Reading file: " + jsonFile);
+    var filepath = path.resolve(__dirname, jsonFile)
+    console.log("Filepath: " + filepath);
 
-    for (let i = 0; i < 64; ++i) {
-      const points = shiftedPrecomputes[i];
+    let myContractProofs: MyStarknetProof[] = [];
+    let myStorageproofs: MyStarknetProof[] = [];
+    var originalParse = JSON.parse(fs.readFileSync(filepath, 'utf8'))
 
-      const toHex = (p: any) => `0x${p.toString(16)}`;
-
-      const pointsArr = points.reduce((acc: string[], p: any) => {
-        acc.push(toHex(p.getX()), toHex(p.getY()));
-        return acc;
-      }, []);
-
-      const chunks = chunk(pointsArr, 128);
-      const contract = contracts[i];
-      await Promise.all(
-        chunks.map((chunk, j) => contract.populate(chunk as any, j * 128))
-      );
-    }
-    console.log("done");
-  });
-
-
-  describe("Verify", function () {
-    it("it should verify the proof", async function () {
-      var jsonFile = "./sampleProof.json";
-      console.log("Reading file: " + jsonFile);
-      var filepath = path.resolve(__dirname, jsonFile)
-      console.log("Filepath: " + filepath);
-
-      let myContractProofs: MyStarknetProof[] = [];
-      let myStorageproofs: MyStarknetProof[] = [];
-      var originalParse = JSON.parse(fs.readFileSync(filepath, 'utf8'))
-
-      originalParse.result.contract_proof.forEach((element: any) => {
-        myContractProofs.push(parseProofElement(element));
-      });
-
-      originalParse.result.contract_data.storage_proofs.forEach((element: any) => {
-        myStorageproofs.push(parseProofElement(element));
-      });
-
-      console.log("contract Proofs: " + myContractProofs.toString());
-      console.log("storage Proofs: " + myStorageproofs.toString());
-
-      const PedersenHash = await ethers.getContractFactory("PedersenHash");
-      const pedersenHash = await PedersenHash.deploy(
-        contracts.map((c) => c.address)
-      );
-
-      await pedersenHash.deployed();
-      const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
-      const proofverifier = await StarknetVerifier.deploy(pedersenHash.address);
-      await proofverifier.deployed();
-
-      console.log("Deployed to: ", proofverifier.address);
-      const starknetStateRoot = "0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37";
-      const contractAddress = "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39";
-      const storageVarAddress = "0x0206F38F7E4F15E87567361213C28F235CCCDAA1D7FD34C9DB1DFE9489C6A091";
-      const contractStateRoot = originalParse.result.contract_data.root;
-      const storageVarValue = "0x1e240";
-
-      const contractData: MyContractData = {
-        stateRoot: starknetStateRoot,
-        contractStateRoot: contractStateRoot,
-        contractAddress: contractAddress,
-        storageVarAddress: storageVarAddress,
-        storageVarValue: storageVarValue,
-        classHash: originalParse.result.contract_data.class_hash,
-        hashVersion: originalParse.result.contract_data.contract_state_hash_version,
-        nonce: originalParse.result.contract_data.nonce
-      };
-
-      const result = await proofverifier.verifyCompleteProof(contractData
-        , myContractProofs, myStorageproofs);
-      // const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myContractProofs);
-      console.log("Result: " + result);
-
+    originalParse.result.contract_proof.forEach((element: any) => {
+      myContractProofs.push(parseProofElement(element));
     });
+
+    originalParse.result.contract_data.storage_proofs.forEach((element: any) => {
+      myStorageproofs.push(parseProofElement(element));
+    });
+
+    console.log("contract Proofs: " + myContractProofs.toString());
+    console.log("storage Proofs: " + myStorageproofs.toString());
+
+    const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
+
+    // UPDATE THIS ADDRESS WITH THE DEPLOYED ADDRESS OF PEDERSENHASH, Run the deploy script to get the address
+    const proofverifier = await StarknetVerifier.deploy("0xc32609c91d6b6b51d48f2611308fef121b02041f");
+    await proofverifier.deployed();
+
+    console.log("Deployed to: ", proofverifier.address);
+    const starknetStateRoot = "0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37";
+    const contractAddress = "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39";
+    const storageVarAddress = "0x0206F38F7E4F15E87567361213C28F235CCCDAA1D7FD34C9DB1DFE9489C6A091";
+    const contractStateRoot = originalParse.result.contract_data.root;
+    const storageVarValue = "0x1e240";
+
+    const contractData: MyContractData = {
+      stateRoot: starknetStateRoot,
+      contractStateRoot: contractStateRoot,
+      contractAddress: contractAddress,
+      storageVarAddress: storageVarAddress,
+      storageVarValue: storageVarValue,
+      classHash: originalParse.result.contract_data.class_hash,
+      hashVersion: originalParse.result.contract_data.contract_state_hash_version,
+      nonce: originalParse.result.contract_data.nonce
+    };
+
+    const result = await proofverifier.verifyCompleteProof(contractData
+      , myContractProofs, myStorageproofs);
+    // const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myContractProofs);
+    console.log("Result: " + result);
+    expect(result).to.equal(true);
   });
 });

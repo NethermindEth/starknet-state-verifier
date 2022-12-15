@@ -120,8 +120,27 @@ contract StarknetVerifier {
             contractData.hashVersion
         );
 
+        bool isStorageProofValid = verify_proof(
+            contractData.contractStateRoot,
+            contractData.storageVarAddress,
+            contractData.storageVarValue,
+            storageProofArray
+        );
+
+        if (isStorageProofValid == false) {
+            console.log("storage proof failed");
+            return false;
+        }
+
+        bool isContractProofValid = verify_proof(
+            contractData.stateRoot,
+            contractData.contractAddress,
+            stateHash,
+            contractProofArray
+        );
+
         console.log("stateHash: %s", stateHash);
-        return false;
+        return isContractProofValid;
     }
 
     function verify_proof(
@@ -177,7 +196,9 @@ contract StarknetVerifier {
                     console.log("expectedHash: %s", expectedHash);
                     console.log("proof.edgeProof.length: %s", length);
                     // length - 1, because we have already progressed towards the LSB of the path
-                    path_bits_index -= uint256(proof.edgeProof.length - 1);
+                    path_bits_index -= uint256(
+                        highestBitSet(proof.edgeProof.path)
+                    );
                     console.log("path_bits_index: %s", path_bits_index);
                     console.log("expectedHash: %s", expectedHash);
                 }

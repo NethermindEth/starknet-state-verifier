@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 
-import {HardhatUserConfig, task} from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
@@ -69,9 +69,8 @@ const config: HardhatUserConfig = {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
   mocha: {
-    timeout: 10000000
+    timeout: 900000000
   }
-
 };
 
 export default config;
