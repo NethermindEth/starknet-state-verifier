@@ -57,14 +57,24 @@ const deploy_tables = async () => {
     "PrecomputedTableState"
   );
 
+  const address = await ethers.provider.getSigner().getAddress()
+
+  console.log("Deploying tables...");
+  let deploymentPromises = [];
   // Sequentially deploy the tables to avoid nonce issues
   for (const i in new Array(64).fill(0)) {
     const contract = await PrecomputedTableState.deploy();
-    await contract.deployed()
     contracts.push(contract);
+    deploymentPromises.push(contract.deployed());
   }
 
+  // wait for all the promises to end.
+  await Promise.all(deploymentPromises);
+  console.log("Tables deployed!");
 
+
+  let populationPromises = []
+  let nonce = await ethers.provider.getTransactionCount(address);
   for (let i = 0; i < 64; ++i) {
     const points = shiftedPrecomputes[i];
 
@@ -78,10 +88,11 @@ const deploy_tables = async () => {
     const chunks = chunk(pointsArr, 128);
     const contract = contracts[i];
     for (const [j, chunk] of chunks.entries()) {
-      await contract.populate(chunk as any, j * 128)
+      populationPromises.push(contract.populate(chunk as any, j * 128,{nonce:nonce++}))
     }
   }
-  console.log("done");
+  await Promise.all(populationPromises);
+  console.log("Tables populated!");
   return contracts;
 }
 
@@ -128,17 +139,13 @@ const verify = async () => {
 
   let pedersenHash: any;
   try {
-    console.log('a')
     const PedersenHash = await ethers.getContractFactory("PedersenHash");
-    console.log('b')
     pedersenHash = await PedersenHash.deploy(
       contracts.map((c: any) => {
         return c.address
       })
     );
-    console.log('c')
     await pedersenHash.deployed();
-    console.log('d')
   } catch (e) {
     console.log(e)
   }
@@ -154,7 +161,7 @@ const verify = async () => {
   }
 
 
-  console.log("Deployed to: ", proofverifier.address);
+  console.log("Verifier contract has been deployed to: ", proofverifier.address);
   const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
   console.log("Result: " + result);
 }
