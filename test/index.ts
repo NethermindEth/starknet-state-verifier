@@ -88,8 +88,7 @@ function parseProofElement(element: any): MyStarknetProof {
         length: element.Edge.path.len,
       },
     };
-  }
-  else {
+  } else {
     throw new Error("Invalid proof element");
   }
 }
