@@ -96,6 +96,14 @@ function parseProofElement(element: any): MyStarknetProof {
 
 
 describe("Verify", function () {
+
+  // it("Time test for a simple hash", async function () {
+  //   const PedersenFactory = await ethers.getContractFactory("PedersenHash");
+  //   const pedersen: PedersenHash = await PedersenFactory.attach("0x01cf58e264d7578D4C67022c58A24CbC4C4a304E");
+  //   const result = await pedersen.hash("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37");
+  //   console.log("Result: " + result);
+  // });
+
   it("it should verify the proof", async function () {
     var jsonFile = "./sampleProof.json";
     console.log("Reading file: " + jsonFile);
@@ -114,13 +122,13 @@ describe("Verify", function () {
       myStorageproofs.push(parseProofElement(element));
     });
 
-    console.log("contract Proofs: " + myContractProofs.toString());
-    console.log("storage Proofs: " + myStorageproofs.toString());
+    // console.log("contract Proofs: " + myContractProofs.toString());
+    // console.log("storage Proofs: " + myStorageproofs.toString());
 
     const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
 
     // UPDATE THIS ADDRESS WITH THE DEPLOYED ADDRESS OF PEDERSENHASH, Run the deploy script to get the address
-    const proofverifier = await StarknetVerifier.deploy("0xc32609c91d6b6b51d48f2611308fef121b02041f");
+    const proofverifier = await StarknetVerifier.deploy("0x59C4e2c6a6dC27c259D6d067a039c831e1ff4947");
     await proofverifier.deployed();
 
     console.log("Deployed to: ", proofverifier.address);
@@ -143,7 +151,6 @@ describe("Verify", function () {
 
     const result = await proofverifier.verifyCompleteProof(contractData
       , myContractProofs, myStorageproofs);
-    // const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myContractProofs);
     console.log("Result: " + result);
     expect(result).to.equal(true);
   });

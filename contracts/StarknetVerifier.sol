@@ -5,6 +5,9 @@ import "./PedersenHash.sol";
 import "hardhat/console.sol";
 
 contract StarknetVerifier {
+    uint256 private constant BIG_PRIME =
+        3618502788666131213697322783095070105623107215331596699973092056135872020481;
+
     enum NodeType {
         BINARY,
         EDGE
@@ -50,21 +53,16 @@ contract StarknetVerifier {
     {
         uint256 hashvalue = 0;
         if (proof.nodeType == NodeType.BINARY) {
-            hashvalue = pedersen.hash(
+            hashvalue = hash(
                 proof.binaryProof.leftHash,
                 proof.binaryProof.rightHash
             );
         } else {
             hashvalue =
-                (pedersen.hash(
-                    proof.edgeProof.childHash,
-                    proof.edgeProof.path
-                ) + uint256(proof.edgeProof.length)) %
-                3618502788666131213697322783095070105623107215331596699973092056135872020481; // module big prime
+                (hash(proof.edgeProof.childHash, proof.edgeProof.path) +
+                    uint256(proof.edgeProof.length)) %
+                BIG_PRIME; // module big prime
         }
-        // console.log("fromBinaryArrayToUint n: %s", hashvalue);
-
-        console.log("hashForSingleProofNode hashvalue: %s", hashvalue);
         return hashvalue;
     }
 
@@ -96,16 +94,34 @@ contract StarknetVerifier {
         uint256 nonce,
         uint256 hashVersion
     ) public view returns (uint256) {
-        uint256 contractRootClassHash = pedersen.hash(
-            classHash,
-            contractStateRoot
+        // uint256 contractRootClassHash = ;
+        // uint256 rootClassHashWithNonce = ;
+        uint256 stateHash = hash(
+            hash(hash(classHash, contractStateRoot), nonce),
+            hashVersion
         );
-        uint256 rootClassHashWithNonce = pedersen.hash(
-            contractRootClassHash,
-            nonce
-        );
-        uint256 stateHash = pedersen.hash(rootClassHashWithNonce, hashVersion);
         return stateHash;
+    }
+
+    function hash(uint256 a, uint256 b) public view returns (uint256) {
+        // TO DO: check if this is correct, the zero index access is not cool
+        return pedersen.hash(convertToBytes(a, b))[0];
+    }
+
+    function convertToBytes(uint256 x, uint256 y)
+        public
+        view
+        returns (bytes memory)
+    {
+        bytes memory b = new bytes(64);
+        assembly {
+            mstore(add(b, 32), x)
+        }
+        assembly {
+            mstore(add(b, 64), y)
+        }
+
+        return b;
     }
 
     function verifyCompleteProof(
@@ -119,7 +135,6 @@ contract StarknetVerifier {
             contractData.nonce,
             contractData.hashVersion
         );
-
         bool isStorageProofValid = verify_proof(
             contractData.contractStateRoot,
             contractData.storageVarAddress,
@@ -128,7 +143,6 @@ contract StarknetVerifier {
         );
 
         if (isStorageProofValid == false) {
-            console.log("storage proof failed");
             return false;
         }
 
@@ -139,7 +153,6 @@ contract StarknetVerifier {
             contractProofArray
         );
 
-        console.log("stateHash: %s", stateHash);
         return isContractProofValid;
     }
 
@@ -152,61 +165,38 @@ contract StarknetVerifier {
         uint256 expectedHash = rootHash;
         uint256 path_bits_index = highestBitSet(path);
 
-        console.log("rootHash: %s", rootHash);
         bool isRight = true;
         for (uint256 i = 0; i < proofArray.length; i++) {
-            console.log("i: %s", i);
-            console.log("path_bits_index: %s", path_bits_index);
             StarknetProof memory proof = proofArray[i];
             if (expectedHash != hashForSingleProofNode(proof)) {
-                console.log("we failed");
                 return false;
-            } else {
-                console.log("yaay we passed");
             }
             if (proof.nodeType == NodeType.BINARY) {
-                // console.log("rootHash: %s", rootHash);
                 isRight = ((path >> path_bits_index) & 1) == 1;
-                //isRight = (getValue(path, path_bits_index) == 1);
-                path = path & ~(1 << path_bits_index);
-                console.log("rem path: %s", path);
+                path = path & ~(1 << path_bits_index); // setting/clearing the bit as move through the path
                 if (isRight == true) {
-                    console.log("isRight");
                     expectedHash = proof.binaryProof.rightHash;
                 } else {
-                    console.log("islLeft");
                     expectedHash = proof.binaryProof.leftHash;
                 }
                 path_bits_index--;
-                console.log(
-                    "Binary",
-                    proof.binaryProof.leftHash,
-                    proof.binaryProof.rightHash
-                );
+                // console.log(
+                //     "Binary",
+                //     proof.binaryProof.leftHash,
+                //     proof.binaryProof.rightHash
+                // );
             } else {
-                console.log("Edge");
-                console.log("proof.edgeProof.path: %s", proof.edgeProof.path);
+                // console.log("Edge");
+                // console.log("proof.edgeProof.path: %s", proof.edgeProof.path);
                 if (path != proof.edgeProof.path) {
-                    console.log("we failed ");
                     return false;
                 } else {
                     uint256 length = proof.edgeProof.length;
-                    console.log("we passed the comparePaths");
                     expectedHash = proof.edgeProof.childHash;
-                    console.log("expectedHash: %s", expectedHash);
-                    console.log("proof.edgeProof.length: %s", length);
-                    // length - 1, because we have already progressed towards the LSB of the path
                     path_bits_index -= uint256(
                         highestBitSet(proof.edgeProof.path)
                     );
-                    console.log("path_bits_index: %s", path_bits_index);
-                    console.log("expectedHash: %s", expectedHash);
                 }
-                console.log(
-                    "Edge",
-                    proof.edgeProof.path,
-                    proof.edgeProof.childHash
-                );
             }
         }
 

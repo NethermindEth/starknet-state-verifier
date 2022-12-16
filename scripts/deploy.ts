@@ -52,52 +52,34 @@ interface MyStarknetProof {
 }
 
 const deploy_tables = async () => {
-  let contracts: any[] = [];
-  const PrecomputedTableState = await ethers.getContractFactory(
-    "PrecomputedTableState"
-  );
+  let precomputedContracts: any[64] = [];
 
-  const address = await ethers.provider.getSigner().getAddress()
-
-  console.log("Deploying tables...");
-  let deploymentPromises = [];
-  // Sequentially deploy the tables to avoid nonce issues
+  let deploymentPromises: any[] = [];
   for (const i in new Array(64).fill(0)) {
-    const contract = await PrecomputedTableState.deploy();
-    contracts.push(contract);
+    const generatedPath = path.join(__dirname, "..", "generated");
+
+    const bytecodePath = path.join(generatedPath, `${i}.bytecode`);
+    const bytecode = fs.readFileSync(bytecodePath);
+    const ContractCodePrecomputed = await ethers.getContractFactory(
+      "ContractCodePrecomputed"
+    );
+    const factory = new ethers.ContractFactory(
+      ContractCodePrecomputed.interface,
+      bytecode.toString(),
+      ContractCodePrecomputed.signer
+    );
+
+    const contract = await factory.deploy();
+    precomputedContracts.push(contract);
     deploymentPromises.push(contract.deployed());
   }
-
-  // wait for all the promises to end.
   await Promise.all(deploymentPromises);
-  console.log("Tables deployed!");
-
-
-  let populationPromises = []
-  let nonce = await ethers.provider.getTransactionCount(address);
-  for (let i = 0; i < 64; ++i) {
-    const points = shiftedPrecomputes[i];
-
-    const toHex = (p: any) => `0x${p.toString(16)}`;
-
-    const pointsArr = points.reduce((acc: string[], p: any) => {
-      acc.push(toHex(p.getX()), toHex(p.getY()));
-      return acc;
-    }, []);
-
-    const chunks = chunk(pointsArr, 128);
-    const contract = contracts[i];
-    for (const [j, chunk] of chunks.entries()) {
-      populationPromises.push(contract.populate(chunk as any, j * 128,{nonce:nonce++}))
-    }
-  }
-  await Promise.all(populationPromises);
-  console.log("Tables populated!");
-  return contracts;
+  return precomputedContracts;
 }
 
 const verify = async () => {
   const contracts = await deploy_tables();
+  console.log("Tables deployed!");
   var jsonFile = "../test/sampleProof.json";
   console.log("Reading file: " + jsonFile);
   var filepath = path.resolve(__dirname, jsonFile)
@@ -141,10 +123,9 @@ const verify = async () => {
   try {
     const PedersenHash = await ethers.getContractFactory("PedersenHash");
     pedersenHash = await PedersenHash.deploy(
-      contracts.map((c: any) => {
-        return c.address
-      })
+      contracts.map((c: any) => c.address as string)
     );
+
     await pedersenHash.deployed();
   } catch (e) {
     console.log(e)
@@ -159,11 +140,9 @@ const verify = async () => {
   } catch (e) {
     console.log(e);
   }
-
-
   console.log("Verifier contract has been deployed to: ", proofverifier.address);
-  const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
-  console.log("Result: " + result);
+  // const result = await proofverifier.verify_proof("0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37", "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39", "0x64233179314709baca174fce33d3691638260a7c5569b74a8efd30998753c9f", myproofs);
+  // console.log("Result: " + result);
 }
 
 verify();

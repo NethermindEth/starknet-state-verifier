@@ -42,10 +42,10 @@ const config: HardhatUserConfig = {
       },
     },
     hardhat: {
-      blockGasLimit: 190000000429720,// whatever you want here,
+      blockGasLimit: 21990000000429720,// whatever you want here,
       gas: "auto",
       accounts: {
-        accountsBalance: "10000347372345184000",
+        accountsBalance: "111045000347372345184000",
         mnemonic: "test test test test test test test test test test test junk",
         path: "m/44'/60'/0'/0",
         initialIndex: 0,
