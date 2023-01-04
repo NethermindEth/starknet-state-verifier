@@ -17,3 +17,6 @@ frontend/.env*
 
 #Pathfinder DB (used w/ docker)
 pathfinder/
+
+#python test file
+test/testpy.py
