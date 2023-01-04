@@ -21,8 +21,37 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
+task("createWallet", "print out address, public and private key", async (_taskArgs, hre) => {
+  const wallet = hre.ethers.Wallet.createRandom()
+  console.log({
+    address: wallet.address,
+    publicKey: wallet.publicKey,
+    privateKey: wallet.privateKey,
+  })
+})
+
+task("getBalance")
+  // specify `--address` argument for the task, task arguments will be available as the 1st parameter `taskArgs` below
+  .addParam("address")
+  // specify handler function for the task, `hre` is the task context that contains `ethers` package
+  .setAction(async (taskArgs, hre) => {
+    // create RPC provider for Goerli network
+    const provider = hre.ethers.getDefaultProvider("goerli");
+    console.log(
+      "$ETH",
+      // format it from Gwei to ETH
+      hre.ethers.utils.formatEther(
+        // fetch wallet balance using its address
+        await provider.getBalance(taskArgs.address)
+      )
+    );
+  });
+
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
+const GOERLI_RPC_URL = process.env.GOERLI_ETHEREUM_API_URL
+const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY || ""
 
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
@@ -42,7 +71,7 @@ const config: HardhatUserConfig = {
       },
     },
     hardhat: {
-      blockGasLimit: 21990000000429720,// whatever you want here,
+      blockGasLimit: 990000000429720,// whatever you want here,
       gas: "auto",
       accounts: {
         accountsBalance: "111045000347372345184000",
@@ -53,6 +82,12 @@ const config: HardhatUserConfig = {
         passphrase: "",
       },
     },
+    goerli: {
+      url: GOERLI_RPC_URL,
+      gas: "auto",
+      accounts: [WALLET_PRIVATE_KEY]
+    },
+
   },
   // networks: {
   //     ropsten: {
