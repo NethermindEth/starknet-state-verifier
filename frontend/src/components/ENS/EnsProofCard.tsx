@@ -1,9 +1,9 @@
 import JsonRpcForm from "../JsonRpc/JsonRpcForm";
-import {Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, VStack} from "@chakra-ui/react";
-import React, {Key, useEffect, useState} from "react";
+import { Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, VStack } from "@chakra-ui/react";
+import React, { Key, useEffect, useState } from "react";
 import JsonRpcResponse from "../JsonRpc/JsonRpcResponse";
-import {ChevronRightIcon, ChevronUpIcon} from '@chakra-ui/icons'
-import {pedersen, starknetKeccak} from "starknet/utils/hash";
+import { ChevronRightIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import { pedersen, starknetKeccak } from "starknet/utils/hash";
 import StorageVarForm from "./StorageVarForm";
 import JsonRpcCard from "../JsonRpc/JsonRpcCard";
 import VerifyProof from "./VerifyProof";
@@ -42,20 +42,19 @@ const getProofMethod = {
 }
 const EnsProofCard = () => {
 
-  const gatewayAddress = 'http://localhost:9545/rpc/v0.2';
+  const gatewayAddress = 'http://139.144.170.180:9545/rpc/v0.2';
 
   const [storageAddress, setStorageAddress] = useState<string>()
   const [contractAddress, setContractAddress] = useState<string>()
   const [proof, setProof] = useState<string>()
-
 
   return (
     <>
       <HStack
       >
         <Heading as={"h3"}
-                 fontSize={"18px"}
-                 fontWeight={"600"}
+          fontSize={"18px"}
+          fontWeight={"600"}
         >ENS Resolution
         </Heading>
       </HStack>
@@ -65,7 +64,7 @@ const EnsProofCard = () => {
         alignItems={"flex-start"}
       >
         <VStack w={"100%"}>
-          <StorageVarForm setStorageAddress={setStorageAddress}/>
+          <StorageVarForm setStorageAddress={setStorageAddress} />
           {storageAddress && <Text fontSize={"12px"} w={"100%"}>{storageAddress}</Text>}
         </VStack>
         <HStack w={"100%"}>
@@ -78,12 +77,12 @@ const EnsProofCard = () => {
             {gatewayAddress}
           </Text>
         </HStack>
-        <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress}/>
-        {proof && <JsonRpcResponse data={proof}/>}
-        <ConnectWallet/>
-        {proof && <VerifyProof storageAddress={storageAddress} contractAddress={contractAddress} proof={proof}/>}
+        <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress} />
+        {proof && <JsonRpcResponse data={proof} />}
+        <ConnectWallet />
+        {proof && <VerifyProof storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}
       </VStack>
-      <Divider/>
+      <Divider />
 
 
     </>);

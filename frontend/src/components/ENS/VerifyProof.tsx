@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {BigNumberish, Signer} from "ethers";
-import {useContractRead} from 'wagmi'
-import {Box, Button, FormLabel, Heading, HStack, Input, Text} from "@chakra-ui/react";
+import React, { useEffect, useState } from 'react';
+import { BigNumberish, Signer } from "ethers";
+import { useContractRead } from 'wagmi'
+import { Box, Button, FormLabel, Heading, HStack, Input, Text } from "@chakra-ui/react";
 import StarknetVerifier from "../../../../artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json";
 
 interface Props {
@@ -32,7 +32,6 @@ interface MyContractData {
   contractStateRoot: BigNumberish;
   contractAddress: BigNumberish;
   storageVarAddress: BigNumberish;
-  storageVarValue: BigNumberish;
   classHash: BigNumberish;
   hashVersion: BigNumberish;
   nonce: BigNumberish;
@@ -42,30 +41,29 @@ interface MyContractData {
 const VerifyProof = (props: Props) => {
   const [verifierAddress, setVerifierAddress] = useState<string>()
   const [starknetStateRoot, setStarknetStateRoot] = useState('');
-  const [value, setValue] = useState('');
   const [storageProof, setStorageProof] = useState([]);
   const [contractProof, setContractProof] = useState([]);
   const [verificationResult, setVerificationResult] = useState<string>();
   const [submit, setSubmit] = useState(false);
   const [contractData, setContractData] = useState<MyContractData>();
 
-  //FIXME here we only verify the first storage_proof as the contract doesn't allow to verify multiple proofs yet?
+
   const readContractVerifier = useContractRead({
     address: verifierAddress,
     abi: StarknetVerifier.abi,
-    functionName: 'verifyCompleteProof',
+    functionName: 'verifiedStorageValue',
     args: [contractData, contractProof, storageProof[0]],
     enabled: false
   });
 
   function parseProofElement(element: any): MyStarknetProof {
     console.log(element)
-    if (element.Binary != undefined) {
+    if (element.binary != undefined) {
       return {
         nodeType: 0,
         binaryProof: {
-          leftHash: element.Binary.left,
-          rightHash: element.Binary.right,
+          leftHash: element.binary.left,
+          rightHash: element.binary.right,
         },
         edgeProof: {
           childHash: 0,
@@ -73,7 +71,7 @@ const VerifyProof = (props: Props) => {
           length: 0,
         },
       };
-    } else if (element.Edge != undefined) {
+    } else if (element.edge != undefined) {
       return {
         nodeType: 1,
         binaryProof: {
@@ -81,9 +79,9 @@ const VerifyProof = (props: Props) => {
           rightHash: 0,
         },
         edgeProof: {
-          childHash: element.Edge.child,
-          path: element.Edge.path.value,
-          length: element.Edge.path.len,
+          childHash: element.edge.child,
+          path: element.edge.path.value,
+          length: element.edge.path.len,
         },
       };
     } else {
@@ -116,7 +114,7 @@ const VerifyProof = (props: Props) => {
 
   // recompute contract data used with the contractRead hook
   useEffect(() => {
-    if (!(starknetStateRoot && value && props.proof && verifierAddress)) {
+    if (!(starknetStateRoot && props.proof && verifierAddress)) {
       return;
     }
     const _contractData: MyContractData = {
@@ -124,13 +122,12 @@ const VerifyProof = (props: Props) => {
       contractStateRoot: props.proof.contract_data.root,
       contractAddress: props.contractAddress!,
       storageVarAddress: props.storageAddress!,
-      storageVarValue: value,
       classHash: props.proof.contract_data.class_hash,
       hashVersion: props.proof.contract_data.contract_state_hash_version,
       nonce: props.proof.contract_data.nonce
     }
     setContractData(_contractData)
-  }, [starknetStateRoot, value, props.proof])
+  }, [starknetStateRoot, props.proof])
 
   // refetch contractRead hook
   useEffect(() => {
@@ -144,9 +141,9 @@ const VerifyProof = (props: Props) => {
     console.log('verifying proof...')
     console.log(readContractVerifier.data)
     if (readContractVerifier.data) {
-      setVerificationResult("true")
-    }else{
-      setVerificationResult("false")
+      setVerificationResult(readContractVerifier.data.toString())
+    } else {
+      setVerificationResult("could not verify proof")
     }
   }
 
@@ -155,11 +152,10 @@ const VerifyProof = (props: Props) => {
     const formData = new FormData(event.currentTarget);
     const _verifier = formData.get('verifier') as string;
     const _stateRoot = formData.get('state-root') as string;
-    const _value = formData.get('storagevar-value') as string;
     setStarknetStateRoot(_stateRoot);
-    setValue(_value);
     setVerifierAddress(_verifier);
     setSubmit(!submit);
+    fetchResult();
   }
 
   return (
@@ -179,7 +175,7 @@ const VerifyProof = (props: Props) => {
             borderRadius={"4px"}
             w={"250px"}
             fontSize={"12px"}
-            type="text" id={"verifier"} name={"verifier"}/>
+            type="text" id={"verifier"} name={"verifier"} />
         </HStack>
         <HStack>
           <FormLabel
@@ -194,22 +190,7 @@ const VerifyProof = (props: Props) => {
             borderRadius={"4px"}
             w={"250px"}
             fontSize={"12px"}
-            type="text" id={"state-root"} name={"state-root"}/>
-        </HStack>
-        <HStack>
-          <FormLabel
-            htmlFor={"storagevar-value"}
-            fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          >Storage variable value</FormLabel>
-          <Input
-            padding={"8px"}
-            border={"1px solid #ccc"}
-            borderRadius={"4px"}
-            w={"250px"}
-            fontSize={"12px"}
-            type="text" id={"storagevar-value"} name={"storagevar-value"}/>
+            type="text" id={"state-root"} name={"state-root"} />
         </HStack>
         <Box>
           <Button
@@ -226,7 +207,7 @@ const VerifyProof = (props: Props) => {
         </Box>
       </form>
       <Box>
-        <Heading as={"h3"}>Result</Heading>
+        <Heading as={"h3"}>Verified Storage Value</Heading>
         <Box>{verificationResult}</Box>
       </Box>
     </>
