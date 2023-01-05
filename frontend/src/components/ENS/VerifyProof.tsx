@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BigNumberish, Signer } from "ethers";
 import { useContractRead } from 'wagmi'
 import { Box, Button, FormLabel, Heading, HStack, Input, Text } from "@chakra-ui/react";
-import StarknetVerifier from "../../../../artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json";
+import StarknetVerifier from "../../abi/StarknetVerifier.json";
 
 interface Props {
   proof: any
