@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig, task, types } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
@@ -8,6 +8,8 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
+import fs from 'fs';
+
 
 dotenv.config();
 
@@ -47,13 +49,31 @@ task("getBalance")
     );
   });
 
+// Define a task to copy the ABI file to the destination folder
+task('copy-abi', 'Copies the ABI file to the destination folder').setAction(async () => {
+  // Check if the ABI file exists
+  // Define the path to the ABI file
+  console.log("Copying ABI file");
+  const abiSourceFilePath = './artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json';
+
+  // Define the destination folder for the ABI file
+  const abiDestinationFilePath = './frontend/src/abi/StarknetVerifier.json';
+
+  // File "destination.txt" will be created or overwritten by default.
+  fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiDestinationFilePath}`);
+  });
+});
+
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 const GOERLI_RPC_URL = process.env.GOERLI_ETHEREUM_API_URL
 const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY || ""
 
-const config: HardhatUserConfig = {
+const userconfig: HardhatUserConfig = {
   solidity: "0.8.4",
   defaultNetwork: "anvil",
   networks: {
@@ -105,7 +125,29 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 900000000
-  }
+  },
 };
 
-export default config;
+module.exports = {
+  // other config options
+  // hooks: {
+  //   'post-compile': async (contract, any) => {
+  //     console.log("Copying ABI file");
+  //     const abiSourceFilePath = './artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json';
+
+  //     // Define the destination folder for the ABI file
+  //     const abiDestinationFilePath = './frontend/src/abi/StarknetVerifier.json';
+
+  //     // File "destination.txt" will be created or overwritten by default.
+  //     fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
+  //       if (err)
+  //         throw err;
+  //       console.log(`ABI file copied to ${abiDestinationFilePath}`);
+  //     });
+  //   },
+  // },
+  // default export
+  default:
+    userconfig
+};
+//export default userconfig;
