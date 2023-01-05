@@ -82,11 +82,11 @@ const config: HardhatUserConfig = {
         passphrase: "",
       },
     },
-    goerli: {
-      url: GOERLI_RPC_URL,
-      gas: "auto",
-      accounts: [WALLET_PRIVATE_KEY]
-    },
+    // goerli: {
+    //   url: GOERLI_RPC_URL,
+    //   gas: "auto",
+    //   accounts: [WALLET_PRIVATE_KEY]
+    // },
 
   },
   // networks: {
