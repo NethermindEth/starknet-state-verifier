@@ -4,6 +4,20 @@ import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
 
+//import "./StarknetCoreImpl.json";
+
+interface StarknetCoreContract {
+    /**
+        Returns the current state root.
+        */
+    function stateRoot() external view returns (uint256);
+
+    /**
+        Returns the current block number.
+        */
+    function stateBlockNumber() external view returns (int256);
+}
+
 contract StarknetVerifier {
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
@@ -14,7 +28,6 @@ contract StarknetVerifier {
     }
 
     struct ContractData {
-        uint256 stateRoot;
         uint256 contractStateRoot;
         uint256 contractAddress;
         uint256 storageVarAddress;
@@ -40,48 +53,26 @@ contract StarknetVerifier {
     }
 
     PedersenHash pedersen;
-    address starknetCoreContractAddress =
-        0xde29d060D45901Fb19ED6C6e959EB22d8626708e; // TODO pointing to address on goerli testnet, needs to be removed
+    StarknetCoreContract starknetCoreContract;
 
-    constructor(
-        address pedersenAddress /*, address _starknetCoreContractAddress*/
-    ) public {
+    // address starknetCoreContractAddress =
+    //     0xde29d060D45901Fb19ED6C6e959EB22d8626708e; // TODO pointing to address on goerli testnet, needs to be removed
+
+    constructor(address pedersenAddress, address _starknetCoreContractAddress)
+        public
+    {
         pedersen = PedersenHash(pedersenAddress);
-        // starknetCoreContractAddress = _starknetCoreContractAddress;
+        starknetCoreContract = StarknetCoreContract(
+            _starknetCoreContractAddress
+        );
     }
-
-    // // This is the signature of the stateBlockNumber function
-    // bytes4 constant STATE_BLOCK_NUMBER_SIGNATURE =
-    //     bytes4(keccak256("stateBlockNumber()"));
-
-    // // This is the signature of the stateBlockNumber function
-    // bytes4 constant STATE_BLOCK_ROOT_SIGNATURE =
-    //     bytes4(keccak256("stateRoot()"));
-
-    // // This function will call the stateBlockNumber function of the contract
-    // function callStateBlockNumber() public view returns (int256) {
-    //     // Call the contract and retrieve the result
-    //     return
-    //         address(starknetCoreContractAddress).call(
-    //             STATE_BLOCK_NUMBER_SIGNATURE
-    //         );
-    // }
-
-    // // This function will call the stateBlockNumber function of the contract
-    // function callStateBlockRoot() public view returns (uint256) {
-    //     // Call the contract and retrieve the result
-    //     return
-    //         address(starknetCoreContractAddress).call(
-    //             STATE_BLOCK_ROOT_SIGNATURE
-    //         );
-    // }
 
     function hashForSingleProofNode(StarknetProof memory proof)
         public
         view
         returns (uint256)
     {
-        uint256 hashvalue = 0;
+        uint256 hashvalue = 0x0;
         if (proof.nodeType == NodeType.BINARY) {
             hashvalue = hash(
                 proof.binaryProof.leftHash,
@@ -157,7 +148,7 @@ contract StarknetVerifier {
         StarknetProof[] calldata contractProofArray,
         StarknetProof[] calldata storageProofArray
     ) public view returns (uint256 value) {
-        console.log("contractData.stateRoot", contractData.stateRoot);
+        console.log("stateRoot", starknetCoreContract.stateRoot());
         uint256 stateHash = stateHash(
             contractData.classHash,
             contractData.contractStateRoot,
@@ -171,7 +162,7 @@ contract StarknetVerifier {
         );
 
         uint256 expectedStateHash = verifyProof(
-            contractData.stateRoot,
+            starknetCoreContract.stateRoot(),
             contractData.contractAddress,
             contractProofArray
         );
