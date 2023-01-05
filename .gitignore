@@ -10,7 +10,7 @@ artifacts
 
 #frontend
 frontend/node_modules
-frontend/.env*
+frontend/.env
 
 #IDE
 .idea
