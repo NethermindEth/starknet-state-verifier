@@ -186,7 +186,7 @@ contract StarknetVerifier {
         StarknetProof[] calldata proofArray
     ) public view returns (uint256 value) {
         uint256 expectedHash = rootHash;
-        int256 pathBitIndex = 250; // start from the highest bit index
+        int256 pathBitIndex = 250; // start from the MSB bit index
 
         bool isRight = true;
         for (uint256 i = 0; i < proofArray.length; i++) {
