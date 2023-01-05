@@ -25,7 +25,6 @@ interface MyStarknetProof {
 }
 
 interface MyContractData {
-  stateRoot: BigNumberish;
   contractStateRoot: BigNumberish;
   contractAddress: BigNumberish;
   storageVarAddress: BigNumberish;
@@ -35,12 +34,13 @@ interface MyContractData {
 }
 
 function parseProofElement(element: any): MyStarknetProof {
-  if (element.Binary != undefined) {
+  // console.log(JSON.stringify(element));
+  if (element.binary != undefined) {
     return {
       nodeType: 0,
       binaryProof: {
-        leftHash: element.Binary.left,
-        rightHash: element.Binary.right,
+        leftHash: element.binary.left,
+        rightHash: element.binary.right,
       },
       edgeProof: {
         childHash: 0,
@@ -48,7 +48,7 @@ function parseProofElement(element: any): MyStarknetProof {
         length: 0,
       },
     };
-  } else if (element.Edge != undefined) {
+  } else if (element.edge != undefined) {
     return {
       nodeType: 1,
       binaryProof: {
@@ -56,9 +56,9 @@ function parseProofElement(element: any): MyStarknetProof {
         rightHash: 0,
       },
       edgeProof: {
-        childHash: element.Edge.child,
-        path: element.Edge.path.value,
-        length: element.Edge.path.len,
+        childHash: element.edge.child,
+        path: element.edge.path.value,
+        length: element.edge.path.len,
       },
     };
   } else {
@@ -66,7 +66,6 @@ function parseProofElement(element: any): MyStarknetProof {
   }
 }
 
-const toHex = (c: any) => `0x${c}`;
 
 const deployTables = async () => {
   let precomputedContracts: any[64] = [];
@@ -99,6 +98,7 @@ const deployTables = async () => {
 describe("Verify", function () {
   let pedersenHash: any;
   let proofverifier: any;
+  let starknetCoreContractStub: any;
 
   before(async () => {
     const contracts = await deployTables();
@@ -110,10 +110,16 @@ describe("Verify", function () {
       await pedersenHash.deployed();
       console.log("PedersenHash contract has been deployed to: ", pedersenHash.address);
 
+      const StarknetCoreContractStub = await ethers.getContractFactory("StarknetCoreContractStub");
+      starknetCoreContractStub = await StarknetCoreContractStub.deploy();
+      await starknetCoreContractStub.deployed();
+      console.log("StarknetCoreContractStub contract has been deployed to: ", starknetCoreContractStub.address);
+
       const StarknetVerifier = await ethers.getContractFactory("StarknetVerifier");
-      proofverifier = await StarknetVerifier.deploy(pedersenHash.address/*, starknetCoreContractAddress*/);
+      proofverifier = await StarknetVerifier.deploy(pedersenHash.address, starknetCoreContractStub.address);
       await proofverifier.deployed();
       console.log("Verifier contract has been deployed to: ", proofverifier.address);
+
     } catch (e) {
       console.log(e)
     }
@@ -145,18 +151,17 @@ describe("Verify", function () {
       myContractProofs.push(parseProofElement(element));
     });
 
-    originalParse.result.contract_data.storage_proofs.forEach((element: any) => {
+    // zero index for a single proof. the API supports multiple proofs but currently we only support one proof verification
+    originalParse.result.contract_data.storage_proofs[0].forEach((element: any) => {
       myStorageproofs.push(parseProofElement(element));
     });
 
-    const starknetStateRoot = "0x1a5b65e4c309eb17b135fc9fcbf4201cf6c049fdf72c8180f0bb03c4d0eca37";
     const contractAddress = "0x6fbd460228d843b7fbef670ff15607bf72e19fa94de21e29811ada167b4ca39";
     const storageVarAddress = "0x0206F38F7E4F15E87567361213C28F235CCCDAA1D7FD34C9DB1DFE9489C6A091";
     const contractStateRoot = originalParse.result.contract_data.root;
     const expectedStorageVarValue = "0x1e240";
 
     const contractData: MyContractData = {
-      stateRoot: starknetStateRoot,
       contractStateRoot: contractStateRoot,
       contractAddress: contractAddress,
       storageVarAddress: storageVarAddress,
