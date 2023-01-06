@@ -27,7 +27,7 @@ task("createWallet", "print out address, public and private key", async (_taskAr
   const wallet = hre.ethers.Wallet.createRandom()
   console.log({
     address: wallet.address,
-    publicKey: wallet.publicKey,
+    // publicKey: wallet.publicKey,
     privateKey: wallet.privateKey,
   })
 })
@@ -47,7 +47,7 @@ task("getBalance")
         await provider.getBalance(taskArgs.address)
       )
     );
-  });
+  })
 
 // Define a task to copy the ABI file to the destination folder
 task('copy-abi', 'Copies the ABI file to the destination folder').setAction(async () => {
@@ -106,16 +106,8 @@ const userconfig: HardhatUserConfig = {
     //   url: GOERLI_RPC_URL,
     //   gas: "auto",
     //   accounts: [WALLET_PRIVATE_KEY]
-    // },
-
+    // }
   },
-  // networks: {
-  //     ropsten: {
-  //       url: process.env.ROPSTEN_URL || "",
-  //       accounts:
-  //         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-  //     },
-  //   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
@@ -128,26 +120,26 @@ const userconfig: HardhatUserConfig = {
   },
 };
 
-module.exports = {
-  // other config options
-  // hooks: {
-  //   'post-compile': async (contract, any) => {
-  //     console.log("Copying ABI file");
-  //     const abiSourceFilePath = './artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json';
+// module.exports = {
+//   // other config options
+//   // hooks: {
+//   //   'post-compile': async (contract, any) => {
+//   //     console.log("Copying ABI file");
+//   //     const abiSourceFilePath = './artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json';
 
-  //     // Define the destination folder for the ABI file
-  //     const abiDestinationFilePath = './frontend/src/abi/StarknetVerifier.json';
+//   //     // Define the destination folder for the ABI file
+//   //     const abiDestinationFilePath = './frontend/src/abi/StarknetVerifier.json';
 
-  //     // File "destination.txt" will be created or overwritten by default.
-  //     fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
-  //       if (err)
-  //         throw err;
-  //       console.log(`ABI file copied to ${abiDestinationFilePath}`);
-  //     });
-  //   },
-  // },
-  // default export
-  default:
-    userconfig
-};
-//export default userconfig;
+//   //     // File "destination.txt" will be created or overwritten by default.
+//   //     fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
+//   //       if (err)
+//   //         throw err;
+//   //       console.log(`ABI file copied to ${abiDestinationFilePath}`);
+//   //     });
+//   //   },
+//   // },
+//   // default export
+//   default:
+//     userconfig
+// };
+export default userconfig;
