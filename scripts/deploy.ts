@@ -48,7 +48,10 @@ const deployAll = async () => {
     console.log("Network: ", network.name);
     if (network.name == "goerli") {
       console.log("Deploying to Goerli");
+
+      // proofverifier = await StarknetVerifier.deploy('0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1', '0xde29d060D45901Fb19ED6C6e959EB22d8626708e');
       proofverifier = await StarknetVerifier.deploy('0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1', '0xde29d060D45901Fb19ED6C6e959EB22d8626708e');
+
     }
     else if (network.name == "mainnet") {
       console.log("Deploying to Mainnet");

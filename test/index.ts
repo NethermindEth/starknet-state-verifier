@@ -169,8 +169,9 @@ describe("Verify", function () {
       hashVersion: originalParse.result.contract_data.contract_state_hash_version,
       nonce: originalParse.result.contract_data.nonce
     };
-
-    const result = await proofverifier.verifiedStorageValue(contractData
+    let coreContractBlockNumber = await starknetCoreContractStub.stateBlockNumber()
+    console.log("Core contract block number: " + coreContractBlockNumber);
+    const result = await proofverifier.verifiedStorageValue(coreContractBlockNumber, contractData
       , myContractProofs, myStorageproofs);
     console.log("Result: " + result);
     expect(result).to.equal(expectedStorageVarValue);
