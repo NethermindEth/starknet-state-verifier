@@ -72,7 +72,7 @@ contract StarknetVerifier {
         view
         returns (uint256)
     {
-        uint256 hashvalue = 0x0;
+        uint256 hashvalue = 0;
         if (proof.nodeType == NodeType.BINARY) {
             hashvalue = hash(
                 proof.binaryProof.leftHash,
@@ -144,11 +144,17 @@ contract StarknetVerifier {
     }
 
     function verifiedStorageValue(
+        int256 blockNumber,
         ContractData calldata contractData,
         StarknetProof[] calldata contractProofArray,
         StarknetProof[] calldata storageProofArray
     ) public view returns (uint256 value) {
         console.log("stateRoot", starknetCoreContract.stateRoot());
+        require(
+            blockNumber == starknetCoreContract.stateBlockNumber(),
+            "Block number is invalid"
+        );
+
         uint256 stateHash = stateHash(
             contractData.classHash,
             contractData.contractStateRoot,
