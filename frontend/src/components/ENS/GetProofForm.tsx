@@ -1,15 +1,38 @@
-import React, { Key } from 'react';
+import React, { Key, useEffect, useState } from 'react';
 import jsonRpcCall from "../../utils/RpcCall";
 import { Box, Button, Flex, FormLabel, Heading, HStack, Input, VStack } from "@chakra-ui/react";
+import { useContractRead } from 'wagmi'
+import StarknetCoreContract from "../../abi/StarknetCoreContract.json";
+import { BigNumber } from 'ethers';
+import { Spinner } from '@chakra-ui/react'
 
 interface Props {
   onResult: (result: any) => void;
+  setBlockNumber: (blockNumber: string) => void;
   setContractAddress: (address: string) => void;
   setStorageAddress: (address: string) => void;
 }
 
+
 const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
   const { onResult } = props;
+  const [isLoading, setIsLoading] = useState(false);
+  const [starknetCoreContractAddress, setStarknetCoreContractAddress] = useState<string>('0xde29d060D45901Fb19ED6C6e959EB22d8626708e')
+
+  const readCoreContract = useContractRead({
+    address: starknetCoreContractAddress,
+    abi: StarknetCoreContract.abi,
+    functionName: 'stateBlockNumber',
+    args: [],
+    enabled: false
+  });
+
+  async function getBlockNumber(): Promise<any> {
+    // Create the JSON-RPC request object
+    await readCoreContract.refetch();
+    let blockNumber: BigNumber = BigNumber.from(readCoreContract.data);
+    return blockNumber.toNumber();
+  }
 
   // Handle the form submission
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -17,29 +40,30 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
     const formData = new FormData(event.currentTarget);
     const contractAddress = formData.get('contract-address') as string;
     const storageAddress = formData.get('storagevar-address') as string;
-    const block = formData.get('block') as string;
+    setStarknetCoreContractAddress(formData.get('corecontract-address') as string);
     props.setStorageAddress(storageAddress);
     props.setContractAddress(contractAddress);
 
-    // test if blockArg is a number
-    let blockArg;
-    const blockNumber = parseInt(block);
-    if (isNaN(blockNumber)) {
-      blockArg = block;
-    } else {
-      blockArg = { block_number: blockNumber };
+    setIsLoading(true);
+    getBlockNumber().then((blockNumber) => {
+      console.log('readCoreContract block #', blockNumber);
+      let blockArg = { 'block_number': blockNumber }
+
+      const args = [
+        blockArg,
+        contractAddress,
+        [storageAddress]
+      ];
+      console.log(args)
+      // Call the JSON-RPC method with the given params
+      // and pass the result to the onResult callback
+      jsonRpcCall("pathfinder_getProof", args).then((result) => {
+        props.setBlockNumber(blockNumber.toString());
+        onResult(result);
+        setIsLoading(false);
+      });
     }
-    const args = [
-      blockArg,
-      contractAddress,
-      [storageAddress]
-    ];
-    console.log(args)
-    // Call the JSON-RPC method with the given params
-    // and pass the result to the onResult callback
-    jsonRpcCall("pathfinder_getProof", args).then((result) => {
-      onResult(result);
-    });
+    );
   };
 
   return (
@@ -85,15 +109,15 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
             fontWeight={"400"}
             fontSize={"12px"}
             w={"150px"}
-          >Block</FormLabel>
+          >StarknetCoreContract Address</FormLabel>
           <Input
-            placeholder={`number or "latest"...`}
+            defaultValue={starknetCoreContractAddress}
             padding={"8px"}
             border={"1px solid #ccc"}
             borderRadius={"4px"}
             w={"250px"}
             fontSize={"12px"}
-            type="text" id={"block"} name={"block"} />
+            type="text" id={"corecontract-address"} name={"corecontract-address"} />
         </HStack>
         <Box>
           <Button
@@ -108,6 +132,7 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
             cursor={"pointer"}
             type="submit">Call pathfinder_getProof</Button>
         </Box>
+        {isLoading && <Spinner />}
       </form>
     </Flex>
   );

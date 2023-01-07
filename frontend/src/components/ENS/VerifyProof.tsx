@@ -3,11 +3,13 @@ import { BigNumberish, Signer } from "ethers";
 import { useContractRead } from 'wagmi'
 import { Box, Button, FormLabel, Heading, HStack, Input, Text } from "@chakra-ui/react";
 import StarknetVerifier from "../../abi/StarknetVerifier.json";
+import { Spinner } from '@chakra-ui/react'
 
 interface Props {
   proof: any
   storageAddress: string | undefined
   contractAddress: string | undefined
+  blockNumber: string | undefined
 }
 
 interface MyBinaryProof {
@@ -28,7 +30,6 @@ interface MyStarknetProof {
 }
 
 interface MyContractData {
-  stateRoot: BigNumberish;
   contractStateRoot: BigNumberish;
   contractAddress: BigNumberish;
   storageVarAddress: BigNumberish;
@@ -37,12 +38,16 @@ interface MyContractData {
   nonce: BigNumberish;
 }
 
+const VERIFIER_ADDRESS = '0x995c2A07cd092AC5E4bCB655B9C0e58FFB952d70' // this is on goerli, plus update in the UI field to your custom deployment
 
 const VerifyProof = (props: Props) => {
-  const [verifierAddress, setVerifierAddress] = useState<string>()
-  const [starknetStateRoot, setStarknetStateRoot] = useState('');
+  const [verifierAddress, setVerifierAddress] = useState<string>(VERIFIER_ADDRESS)
+  // const [starknetStateRoot, setStarknetStateRoot] = useState('');
   const [storageProof, setStorageProof] = useState([]);
   const [contractProof, setContractProof] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [blockNumber, setBlockNumber] = useState<string>();
+
   const [verificationResult, setVerificationResult] = useState<string>();
   const [submit, setSubmit] = useState(false);
   const [contractData, setContractData] = useState<MyContractData>();
@@ -52,8 +57,9 @@ const VerifyProof = (props: Props) => {
     address: verifierAddress,
     abi: StarknetVerifier.abi,
     functionName: 'verifiedStorageValue',
-    args: [contractData, contractProof, storageProof[0]],
+    args: [props.blockNumber, contractData, contractProof, storageProof[0]],
     enabled: false
+
   });
 
   function parseProofElement(element: any): MyStarknetProof {
@@ -114,11 +120,10 @@ const VerifyProof = (props: Props) => {
 
   // recompute contract data used with the contractRead hook
   useEffect(() => {
-    if (!(starknetStateRoot && props.proof && verifierAddress)) {
+    if (!(props.proof)) {
       return;
     }
     const _contractData: MyContractData = {
-      stateRoot: starknetStateRoot,
       contractStateRoot: props.proof.contract_data.root,
       contractAddress: props.contractAddress!,
       storageVarAddress: props.storageAddress!,
@@ -127,7 +132,7 @@ const VerifyProof = (props: Props) => {
       nonce: props.proof.contract_data.nonce
     }
     setContractData(_contractData)
-  }, [starknetStateRoot, props.proof])
+  }, [props.proof])
 
   // refetch contractRead hook
   useEffect(() => {
@@ -137,22 +142,31 @@ const VerifyProof = (props: Props) => {
   }, [contractData, contractProof, storageProof, verifierAddress])
 
   const fetchResult = async () => {
-    await readContractVerifier.refetch()
-    console.log('verifying proof...')
-    console.log(readContractVerifier.data)
-    if (readContractVerifier.data) {
-      setVerificationResult(readContractVerifier.data.toString())
-    } else {
-      setVerificationResult("could not verify proof")
+    try {
+      setIsLoading(true)
+      console.log('block number', props.blockNumber);
+      await readContractVerifier.refetch({
+        throwOnError: true,
+        cancelRefetch: false
+      })
+      console.log('verifying proof...')
+      console.log(readContractVerifier.data)
+      if (readContractVerifier.data) {
+        setVerificationResult(readContractVerifier.data.toString())
+      } else {
+        setVerificationResult("could not verify proof")
+      }
+    } catch (error) {
+      console.log(error)
+      setVerificationResult(error.message)
     }
+    setIsLoading(false)
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const _verifier = formData.get('verifier') as string;
-    const _stateRoot = formData.get('state-root') as string;
-    setStarknetStateRoot(_stateRoot);
     setVerifierAddress(_verifier);
     setSubmit(!submit);
     fetchResult();
@@ -175,9 +189,9 @@ const VerifyProof = (props: Props) => {
             borderRadius={"4px"}
             w={"250px"}
             fontSize={"12px"}
-            type="text" id={"verifier"} name={"verifier"} />
+            type="text" id={"verifier"} name={"verifier"} defaultValue={verifierAddress} />
         </HStack>
-        <HStack>
+        {/* <HStack>
           <FormLabel
             htmlFor={"state-root"}
             fontWeight={"400"}
@@ -191,7 +205,7 @@ const VerifyProof = (props: Props) => {
             w={"250px"}
             fontSize={"12px"}
             type="text" id={"state-root"} name={"state-root"} />
-        </HStack>
+        </HStack> */}
         <Box>
           <Button
             margin={"8px 0 0"}
@@ -208,7 +222,8 @@ const VerifyProof = (props: Props) => {
       </form>
       <Box>
         <Heading as={"h3"}>Verified Storage Value</Heading>
-        <Box>{verificationResult}</Box>
+        {!isLoading && <Box>{verificationResult}</Box>}
+        {isLoading && <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl' />}
       </Box>
     </>
 
