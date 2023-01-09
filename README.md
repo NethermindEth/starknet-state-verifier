@@ -4,7 +4,7 @@
 ```shell
 cd frontend
 yarn install
-mv .env.example .env
+cp .env.example .env
 yarn build
 yarn dev
 ```
@@ -13,7 +13,7 @@ yarn dev
 From the root folder run the following
 ```shell
 yarn install
-mv .env.example .env
+cp .env.example .env
 npx hardhat run scripts/deploy.ts
 ```
 
