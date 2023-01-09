@@ -1,0 +1,52 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Build and push to s3.
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+  
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+  
+env:
+  ROLE_NAME: '${{ secrets.ROLE_NAME }}'
+  AWS_REGION: '${{ secrets.AWS_REGION }}'
+  S3_BUCKET_NAME: '${{ secrets.S3_BUCKET_NAME }}'
+  CLOUDFRONT_DIST_ID: '${{ secrets.CLOUDFRONT_DIST_ID }}'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        
+    - name: Install packages
+      working-directory: frontend
+      run: yarn install
+      
+    - name: Build dist
+      working-directory: frontend
+      run: yarn build
+      
+    - name: "Configure AWS Credentials Action"
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: '${{ env.ROLE_NAME }}'
+        role-session-name: SessionRole
+        aws-region: '${{ env.AWS_REGION }}'
+        
+    - name: Sync dist folder with s3 bucket
+      working-directory: frontend/dist
+      run: aws s3 sync --delete . s3://'${{ env.S3_BUCKET_NAME }}'
+      
+    - name: Invalidate Cache for Cloudfront distribution
+      run: aws cloudfront create-invalidation --distribution-id '${{ env.CLOUDFRONT_DIST_ID }}' --paths '/*'
