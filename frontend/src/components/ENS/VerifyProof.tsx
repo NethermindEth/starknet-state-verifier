@@ -158,7 +158,7 @@ const VerifyProof = (props: Props) => {
       }
     } catch (error) {
       console.log(error)
-      setVerificationResult(error.message)
+      setVerificationResult((error as Error).message)
     }
     setIsLoading(false)
   }
