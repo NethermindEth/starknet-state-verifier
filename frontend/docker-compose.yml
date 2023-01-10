@@ -7,7 +7,7 @@ services:
       target: dev
     command: yarn dev
     ports:
-      - $UI_PORT:$UI_PORT
+      - 8800:8800
     volumes:
       - /app/node_modules
       - ./:/app

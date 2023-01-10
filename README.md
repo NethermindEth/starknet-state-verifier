@@ -4,7 +4,6 @@
 ```shell
 cd frontend
 yarn install
-cp .env.example .env
 yarn build
 yarn dev
 ```
