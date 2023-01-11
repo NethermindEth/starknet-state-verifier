@@ -6,6 +6,11 @@ import StarknetCoreContract from "../../abi/StarknetCoreContract.json";
 import { BigNumber } from 'ethers';
 import { Spinner } from '@chakra-ui/react'
 import { ethers } from 'ethers';
+
+import { useAccount, useConnect } from 'wagmi'
+import { InjectedConnector } from "wagmi/connectors/injected";
+
+
 interface Props {
   onResult: (result: any) => void;
   setStarknetCommittedBlockNumber: (blockNumber: string) => void;
@@ -35,8 +40,17 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
     return BigNumber.from(starknetCommittedBlock).toNumber();
   }
 
+  const { connector: activeConnector, isConnected } = useAccount()
+  const { connect, connectors, error, pendingConnector } =
+    useConnect({
+      connector: new InjectedConnector(),
+    })
+
   // Handle the form submission
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    if (!isConnected) {
+      connect()
+    }
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const contractAddress = formData.get('contract-address') as string;
