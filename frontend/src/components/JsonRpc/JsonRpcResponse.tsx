@@ -1,8 +1,50 @@
-import React, {Key} from "react";
-import {Box, Code, Flex} from "@chakra-ui/react";
+import React, { Key } from "react";
+import { Box, Code, Flex, Icon } from "@chakra-ui/react";
+import { EditablePreview, EditableTextarea, useColorModeValue, IconButton, Input, useDisclosure, useEditableControls, ButtonGroup, SlideFade, Editable, Tooltip, EditableInput } from "@chakra-ui/react";
+import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
+import { json } from "starknet"
 
+const EditableControls = () => {
+  const {
+    isEditing,
+    getSubmitButtonProps,
+    getCancelButtonProps,
+    getEditButtonProps,
+  } = useEditableControls();
+  return isEditing ? (
+    <Flex justifyContent="center" mt="2">
+      <ButtonGroup size='sm'>
+        <IconButton aria-label='Save' icon={<CheckIcon />} {...getSubmitButtonProps()} />
+        <IconButton aria-label='Cancel' icon={<CloseIcon />} {...getCancelButtonProps()} />
+      </ButtonGroup>
+    </Flex>
+  ) : (
+    <Flex justifyContent='center'>
+      <IconButton size='sm' aria-label="edit" icon={<EditIcon />} {...getEditButtonProps()} />
+    </Flex>
+  )
+};
 
-const JsonRpcResponse = ({data}: { data: any }) => {
+interface Props {
+  data: any;
+  onResult: (result: any) => void;
+}
+
+const JsonRpcResponse = (props: Props) => {
+
+  const onSubmit = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log(event.target.value)
+    //   props.onResult(event.target.value)
+  }
+  const onSubmitString = (newValue: string) => {
+    try {
+      let jsonObject = json.parse(newValue)
+      props.onResult(jsonObject)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
     <Flex
@@ -12,13 +54,12 @@ const JsonRpcResponse = ({data}: { data: any }) => {
       w={"100%"}
       padding={"16px"}
     >
-      {data && <Code maxHeight={"500px"} maxW={"800px"} overflowX={"scroll"} textAlign="left" whiteSpace={"pre"}
-                     display={"block"} _hover={{backgroundColor: "gray.200"}}
-                     onClick={(e) => navigator.clipboard.writeText(JSON.stringify(data))} cursor={"copy"}
-      >
-        {JSON.stringify(data, null, 2)}
-      </Code>
-      }
+      {props.data && <Editable maxHeight={"500px"} maxW={"800px"} overflowX={"scroll"} textAlign="left" whiteSpace={"pre"}
+        display={"block"} backgroundColor="gray.100" _hover={{ backgroundColor: "gray.200" }} defaultValue={JSON.stringify(props.data, null, 2)} onSubmit={onSubmitString} >
+        <EditablePreview />
+        <EditableTextarea height="500px" width="800px" />
+        <EditableControls />
+      </Editable>}
     </Flex>
   );
 };

@@ -80,13 +80,11 @@ const EnsProofCard = () => {
           </Text>
         </HStack>
         <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress} setEthereumBlockNumber={setEthereumBlockNumber} setStarknetCommittedBlockNumber={setStarknetCommittedBlockNumber} />
-        {proof && <JsonRpcResponse data={proof} />}
+        {proof && <JsonRpcResponse data={proof} onResult={setProof} />}
         <ConnectWallet />
         {proof && <VerifyProof ethereumBlockNumber={ethereumBlockNumber} starknetCommittedBlockNumber={starknetCommittedBlockNumber} storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}
       </VStack>
       <Divider />
-
-
     </>);
 }
 

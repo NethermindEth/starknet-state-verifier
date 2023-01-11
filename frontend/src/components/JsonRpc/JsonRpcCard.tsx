@@ -1,8 +1,8 @@
 import JsonRpcForm from "./JsonRpcForm";
-import {Box, Card, Collapse, Divider, Heading, HStack} from "@chakra-ui/react";
-import React, {Key} from "react";
+import { Box, Card, Collapse, Divider, Heading, HStack } from "@chakra-ui/react";
+import React, { Key } from "react";
 import JsonRpcResponse from "./JsonRpcResponse";
-import {ChevronRightIcon, ChevronUpIcon} from '@chakra-ui/icons'
+import { ChevronRightIcon, ChevronUpIcon } from '@chakra-ui/icons'
 
 interface Props {
   // The name of the JSON-RPC method to call
@@ -22,10 +22,10 @@ const JsonRpcCard = (props: Props) => {
         onClick={() => setFolded(!folded)}
         cursor={"pointer"}
       >
-        {folded ? <ChevronRightIcon/> : <ChevronUpIcon/>}
+        {folded ? <ChevronRightIcon /> : <ChevronUpIcon />}
         <Heading as={"h3"}
-                 fontSize={"18px"}
-                 fontWeight={"600"}
+          fontSize={"18px"}
+          fontWeight={"600"}
         >{props.method.name}
         </Heading>
       </HStack>
@@ -35,9 +35,9 @@ const JsonRpcCard = (props: Props) => {
           params={props.method.params}
           onResult={setResult}
         />
-        <JsonRpcResponse data={result}/>
+        <JsonRpcResponse data={result} onResult={(data: any) => { }} />
       </Collapse>
-      <Divider/>
+      <Divider />
     </>
   )
 
@@ -46,7 +46,7 @@ const JsonRpcCard = (props: Props) => {
       marginY={"8px"}
       borderRadius={"4px"}
     >
-      <RpcCallCard/>
+      <RpcCallCard />
     </Box>
   );
 }
