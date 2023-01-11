@@ -1,14 +1,15 @@
 import React, { Key, useEffect, useState } from 'react';
 import jsonRpcCall from "../../utils/RpcCall";
 import { Box, Button, Flex, FormLabel, Heading, HStack, Input, VStack } from "@chakra-ui/react";
-import { useContractRead } from 'wagmi'
+import { useBlockNumber, useContractRead, useProvider } from 'wagmi'
 import StarknetCoreContract from "../../abi/StarknetCoreContract.json";
 import { BigNumber } from 'ethers';
 import { Spinner } from '@chakra-ui/react'
-
+import { ethers } from 'ethers';
 interface Props {
   onResult: (result: any) => void;
-  setBlockNumber: (blockNumber: string) => void;
+  setStarknetCommittedBlockNumber: (blockNumber: string) => void;
+  setEthereumBlockNumber: (blockNumber: string) => void;
   setContractAddress: (address: string) => void;
   setStorageAddress: (address: string) => void;
 }
@@ -18,20 +19,20 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
   const { onResult } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [starknetCoreContractAddress, setStarknetCoreContractAddress] = useState<string>('0xde29d060D45901Fb19ED6C6e959EB22d8626708e')
+  const provider = useProvider()
+  async function getLatestEthereumBlockNumber(): Promise<any> {
+    const ethereumBlockNumber = await provider.getBlockNumber();
+    return ethereumBlockNumber;
+  }
+  async function getStarknetCommittedBlockNumber(ethereumBlockNumber: number): Promise<any> {
 
-  const readCoreContract = useContractRead({
-    address: starknetCoreContractAddress,
-    abi: StarknetCoreContract.abi,
-    functionName: 'stateBlockNumber',
-    args: [],
-    enabled: false
-  });
-
-  async function getBlockNumber(): Promise<any> {
-    // Create the JSON-RPC request object
-    await readCoreContract.refetch();
-    let blockNumber: BigNumber = BigNumber.from(readCoreContract.data);
-    return blockNumber.toNumber();
+    const readCoreContract = new ethers.Contract(
+      starknetCoreContractAddress,
+      StarknetCoreContract.abi,
+      provider
+    );
+    const starknetCommittedBlock = await readCoreContract.stateBlockNumber({ blockTag: ethereumBlockNumber })
+    return BigNumber.from(starknetCommittedBlock).toNumber();
   }
 
   // Handle the form submission
@@ -45,23 +46,25 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
     props.setContractAddress(contractAddress);
 
     setIsLoading(true);
-    getBlockNumber().then((blockNumber) => {
-      console.log('readCoreContract block #', blockNumber);
-      let blockArg = { 'block_number': blockNumber }
-
-      const args = [
-        blockArg,
-        contractAddress,
-        [storageAddress]
-      ];
-      console.log(args)
-      // Call the JSON-RPC method with the given params
-      // and pass the result to the onResult callback
-      jsonRpcCall("pathfinder_getProof", args).then((result) => {
-        props.setBlockNumber(blockNumber.toString());
-        onResult(result);
-        setIsLoading(false);
-      });
+    const ethereumBlockNumber = getLatestEthereumBlockNumber().then((ethereumBlockNumber) => {
+      props.setEthereumBlockNumber(ethereumBlockNumber.toString());
+      getStarknetCommittedBlockNumber(ethereumBlockNumber).then((committedBlockNumber) => {
+        console.log('readCoreContract block #', committedBlockNumber);
+        let blockArg = { 'block_number': committedBlockNumber }
+        const args = [
+          blockArg,
+          contractAddress,
+          [storageAddress]
+        ];
+        console.log(args)
+        // Call the JSON-RPC method with the given params
+        // and pass the result to the onResult callback
+        jsonRpcCall("pathfinder_getProof", args).then((result) => {
+          props.setStarknetCommittedBlockNumber(committedBlockNumber.toString());
+          onResult(result);
+          setIsLoading(false);
+        });
+      })
     }
     );
   };

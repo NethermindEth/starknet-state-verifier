@@ -9,7 +9,8 @@ interface Props {
   proof: any
   storageAddress: string | undefined
   contractAddress: string | undefined
-  blockNumber: string | undefined
+  ethereumBlockNumber: string | undefined
+  starknetCommittedBlockNumber: string | undefined
 }
 
 interface MyBinaryProof {
@@ -57,9 +58,19 @@ const VerifyProof = (props: Props) => {
     address: verifierAddress,
     abi: StarknetVerifier.abi,
     functionName: 'verifiedStorageValue',
-    args: [props.blockNumber, contractData, contractProof, storageProof[0]],
-    enabled: false
-
+    args: [props.starknetCommittedBlockNumber, contractData, contractProof, storageProof[0]],
+    overrides: { blockTag: parseInt(props.ethereumBlockNumber!) },
+    enabled: false,
+    onError: (error: Error) => {
+      console.log(error)
+      setVerificationResult(error.message)
+    }, onSettled(data, error: Error | null) {
+      if (data) {
+        setVerificationResult(data.toString())
+      } else {
+        setVerificationResult(error?.message)
+      }
+    },
   });
 
   function parseProofElement(element: any): MyStarknetProof {
@@ -144,23 +155,18 @@ const VerifyProof = (props: Props) => {
   const fetchResult = async () => {
     try {
       setIsLoading(true)
-      console.log('block number', props.blockNumber);
+      console.log('block number', props.ethereumBlockNumber);
       await readContractVerifier.refetch({
         throwOnError: true,
-        cancelRefetch: false
+        cancelRefetch: false,
       })
       console.log('verifying proof...')
-      console.log(readContractVerifier.data)
-      if (readContractVerifier.data) {
-        setVerificationResult(readContractVerifier.data.toString())
-      } else {
-        setVerificationResult("could not verify proof")
-      }
+      setIsLoading(false)
+
     } catch (error) {
       console.log(error)
-      setVerificationResult((error as Error).message)
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

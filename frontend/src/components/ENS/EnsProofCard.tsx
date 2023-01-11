@@ -46,7 +46,8 @@ const EnsProofCard = () => {
 
   const [storageAddress, setStorageAddress] = useState<string>()
   const [contractAddress, setContractAddress] = useState<string>()
-  const [blockNumber, setBlockNumber] = useState<string>()
+  const [ethereumBlockNumber, setEthereumBlockNumber] = useState<string>()
+  const [starknetCommittedBlockNumber, setStarknetCommittedBlockNumber] = useState<string>()
   const [proof, setProof] = useState<string>()
 
   return (
@@ -78,10 +79,10 @@ const EnsProofCard = () => {
             {gatewayAddress}
           </Text>
         </HStack>
-        <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress} setBlockNumber={setBlockNumber} />
+        <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress} setEthereumBlockNumber={setEthereumBlockNumber} setStarknetCommittedBlockNumber={setStarknetCommittedBlockNumber} />
         {proof && <JsonRpcResponse data={proof} />}
         <ConnectWallet />
-        {proof && <VerifyProof blockNumber={blockNumber} storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}
+        {proof && <VerifyProof ethereumBlockNumber={ethereumBlockNumber} starknetCommittedBlockNumber={starknetCommittedBlockNumber} storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}
       </VStack>
       <Divider />
 
