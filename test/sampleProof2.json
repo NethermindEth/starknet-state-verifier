@@ -1,0 +1,234 @@
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "contract_proof": [
+            {
+                "binary": {
+                    "left": "0x4566c35a0c33ad1be669840601e5c5bbba4937b51d5a8f1d3937f4b1c366de5",
+                    "right": "0x7743561f91512904293c2dd58bf1b0fec0e536b9df0ce019318b32cc08d42e1"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x63669754dfd36214c402afdf98b53bda47eca3b1f5a3dcea6d4f610fc739002",
+                    "right": "0x3e5bc785b12bbc16507f3a5667b4c3fa8bd0a691631cd56706b9048ac618440"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x1aa84202341b138dbc44878f3974fa4ba953013d4cb924ad9961a23b66e4737",
+                    "right": "0x25ff1bd913e0cf7b3ed69c3cda32f8090c020ac57f29eb0556b339efc262f54"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x25020ede290ccd3d6290005a4fbbf3a1f2514b0425c3c8f4abc88cd6aa0b7b1",
+                    "right": "0x16f16dbbb9bc880e44bbc4ba56b6589eb35f67f6c5b4eeac0da859deb1d2060"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x6c28e50a3ef7b7a9cd25423e5c29704d8dea7a5cde642c9748d674dfbd060a",
+                    "right": "0x5c28c730c767c463e3ea694b2ad6a99314c23f1ceb450f7e18d68ced0491f8"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x4953c4c47c2ce10569147c73b51080eae3c27b620430e2d3f5770d20b63ba85",
+                    "right": "0x58fa842cc8321270fe6ec2991f0b701f71c6de04c5c6bfa0f95debf5f1ca245"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x45bbcab0930a3eb0797102905ad1fc321fae992866c0b8c0edf426edbf63d6f",
+                    "right": "0x4627d91af497b8ec5184c21e532799f145c72dcf0f27ead041ed648bb198808"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x614993de23a2396f401c8bb350c5c3d06f6a2d20818a899c47bd9ff585f8328",
+                    "right": "0x2a558e4f963ab2c07c8668924f220dbf15e52d3b41c6524d29bc5a2308e831"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x3edea4fc4d42180b3074c9aa2d6a216738b3edece107d4aa791ead4cd5e58a5",
+                    "right": "0x60c05bfc483205d1e5cb78998fe0744429c4484678bbda16a956394e1e3d39b"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x1f6b70c32205bb2ae989baadce57396e03d11cf5a9eeccdf9e6b2c078d81413",
+                    "right": "0x1eebb5f8a92199ec5c4d4adc98dae2cf6f7f4feac08ea47fd42817370a0ffc"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x6a2e911f346ab85edbc224606a68d916f1cfe8f84ab9100ed220772184d16b7",
+                    "right": "0x286e2241180024c4f234b9c95dfebf6470513d8b1fa0b3c770f0fc9d2ca4f29"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x66c90c7a28a01b7c42f2bedf2aee6f94ea175c736c7b215eed08404c0a9f3c3",
+                    "right": "0x6e0e391bb30d786565d853c5a0677390097e0b9dd66e3b590cce3f3f3db88a"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x3c367f92e4dcdcfb50f354cc2d850a31815b2546af458ec4557a42888ae91c1",
+                    "right": "0x4966f3fd8e968d624d90af911c2f5efdd29682e12911d632230e3a8f2647224"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x18ce5a36242af30d1e5b957e6cbd4b50a90134f5303b717535455efd4160a40",
+                    "right": "0x5815b1aab4f12d609f41c62be470f35465a2b7cd660a2fcc8353615aeca787f"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x38f5f0e64367e97d74781e9cb5bf097fcacfbf9dbdff3c410caa7db5ba265e",
+                    "right": "0x300d200225e058c28c8c5f3144fe195ee7bb8ee0aade8f7aea639d89ae4cab5"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x4adcb595010ce55095dac92ce33f9fda2dc9a497b6b3cb80e667934867c61d3",
+                    "right": "0x24bb114379a35fc36a66d820ab7fd70eb72f660b729993ee6de9f94340d4a13"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x53b66c284024bda3de20fde1e01ffe5519215a21a0d531bed3aa519adffb9c8",
+                    "right": "0x77c939d4cd28779095feb590ad212896177bc65463bfccc300760f8b590135"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x3182c37cfe34cce09cfc0d290bb35d16a9fc917b306c88d488804e4dc895cbd",
+                    "right": "0x2aadbdd399e386169a99c22842c5db5890cdcb01f8b55ae42f89e861a8370d5"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x3f03953dfd0fb2c57aa9285281d3810f67f4ca1b0ec3319ec92b269a1af71b7",
+                    "right": "0x3754024fd76d58e4a5b7b6c83f5a1c6fe561158e750b7790671584856b37f22"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x5e61607b9790bda68d8cd34a89368eaecbadfeaa074ebd78d462b935d91cc9d",
+                    "right": "0x1afeb94ace93314f1437665eeb55f273e2ba2d0d8619ebb1baa70fbf546bfc9"
+                }
+            },
+            {
+                "edge": {
+                    "path": {
+                        "value": "0x1",
+                        "len": 1
+                    },
+                    "child": "0x433d95f38d52f4248e022bbabc74e6de942a5cea9bd7f02a05f6bd7fa18f8f1"
+                }
+            },
+            {
+                "binary": {
+                    "left": "0x6d1fc734b5a8cfb1af403f229d307ed9abc9841ee9f30c3b7de04e06a522b1d",
+                    "right": "0x6a245d57f2c35512edb7cdc77e4f4761add0586e761fabb01edb98657073db"
+                }
+            },
+            {
+                "edge": {
+                    "path": {
+                        "value": "0x1708011fb5089778204f37d6111bd9bbac0fe4b6e7851292b8cbeeb6ef",
+                        "len": 229
+                    },
+                    "child": "0x14ae025d0b6cc0dea2c63455167801b46429852859777ff9d45248124892789"
+                }
+            }
+        ],
+        "contract_data": {
+            "class_hash": "0x4572af1cd59b8b91055ebb78df8f1d11c59f5270018b291366ba4585d4cdff0",
+            "nonce": "0x0",
+            "root": "0x275220877e48aab12bc6a2d03023d8a9dbc9f075881d767d531d07fa0f1de86",
+            "contract_state_hash_version": "0x0",
+            "storage_proofs": [
+                [
+                    {
+                        "binary": {
+                            "left": "0x6baf47e04a857e7e2dc82735a1cc69b4edf5dcc3faae3f40d152285f5bd64a7",
+                            "right": "0x341e1107146aea6eaf1a6b470ce2aba40d25cb420db64c6a6faf4a1f2926f8c"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x42925563d974bf1bb24869b1947562d91aea22e69bfc7b0948f6aed19752266",
+                            "right": "0x49bed4e434b821ad2627fabd6511f5e330e58bbe1133dc5779d584f2e1e3fda"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x337343b9069887d8729cffd6e7ed7ee7f04f5e5685007a9b520064e3b8d76eb",
+                            "right": "0x6ae3003ff3e115b194f46cad0b6641e87ea71d69dd09e64084d6cb005b40ea4"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x29203e93a810ea9d0a83d59ac886e999318d794c4130fba5654e0c9b2d736ac",
+                            "right": "0x5d0e06125347f09cf0644b28f552fdbc0eee0df39edf173545f93b1d71aebc0"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x790a49678bc7921aaa98c54b4a7d65084ed35f725ea8c96bdafddfd7bf26ac5",
+                            "right": "0x51095e654c7dd6d3276a9cf79b9138632f8640ab85d1b90a563c0ece9fcc79a"
+                        }
+                    },
+                    {
+                        "edge": {
+                            "path": {
+                                "value": "0x1424ccd149cd45aa59418c09ef59920b848254d28a2a3876548beb375b4b8",
+                                "len": 241
+                            },
+                            "child": "0x2f7031752219860868c4cba6742ee5a9510e78e5209538e71b75d338786f74d"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x642b03cfefb990fadb5c173d4fdb4209a7d8724c82b2f536872923fee68a0a3",
+                            "right": "0x7def240db951c8b374f7ce8bb38c8e51f9be0daf76c0280542e06bb2958958f"
+                        }
+                    },
+                    {
+                        "edge": {
+                            "path": {
+                                "value": "0x1",
+                                "len": 1
+                            },
+                            "child": "0x5b43e1b9d40942e55f102617c8f127037be85501adca776139ccc53730551d4"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x770cd2e4b902ead150c371d8aac3b64d7d393b7d981698fb09b7eb7833042fb",
+                            "right": "0x604d34f95ee0217af6fff75f29c8fcf7dbc58d2415f052ce698f9bb72865a8e"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x54c0e21bd4b1d3b405a20af189ea98e2f54f867e0589f62eddd573e9c6850dd",
+                            "right": "0x7c404440d435a820036debff190ec903f5d750c8f5ecbf6dfce404e7d65f2ac"
+                        }
+                    },
+                    {
+                        "binary": {
+                            "left": "0x1c62c52c1709acb3eb9195594e39c04323658463cfe0c641e39b99a83ba11a1",
+                            "right": "0x47396aa67f4dd4f5c730b4445f27f137dc900e46d49bf8599fd150852175288"
+                        }
+                    }
+                ]
+            ]
+        }
+    },
+    "id": 1
+}
