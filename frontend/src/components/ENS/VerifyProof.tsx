@@ -233,8 +233,14 @@ const VerifyProof = (props: Props) => {
         </Box>
       </form>
       <Box>
-        <Heading as={"h3"}>Verified Storage Value</Heading>
-        {!isLoading && <Box>{verificationResult}</Box>}
+        <Heading as={"h5"}>Verified Storage Value  </Heading>
+        {!isLoading && <Text> against ethereum block # {props.ethereumBlockNumber} and starknet block # {props.starknetCommittedBlockNumber} </Text>}
+        {!isLoading && <Box>Value is = <strong >   {verificationResult}</strong> </Box>}
+        {/* <Heading as={"h1"}>Verified for ethereum block number </Heading> */}
+        {/* {!isLoading && <Box>{props.ethereumBlockNumber}</Box>}
+        <Heading as={"h1"}>Verified for starknet block number </Heading>
+        {!isLoading && <Box>{props.starknetCommittedBlockNumber}</Box>} */}
+
         {isLoading && <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl' />}
       </Box>
     </>
