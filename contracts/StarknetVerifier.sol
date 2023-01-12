@@ -4,8 +4,8 @@ import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
 
-//import "./StarknetCoreImpl.json";
-
+// Starknet Core Contract Minimal Interface
+// Defining the parts of the core contract interface that we need. i.e. stateRoot and stateBlockNumber
 interface StarknetCoreContract {
     /**
         Returns the current state root.
@@ -18,6 +18,7 @@ interface StarknetCoreContract {
     function stateBlockNumber() external view returns (int256);
 }
 
+// Starknet Proof Verifier. This contract verifies a Starknet proof for a contract and a storage address/value
 contract StarknetVerifier {
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
@@ -55,9 +56,6 @@ contract StarknetVerifier {
     PedersenHash pedersen;
     StarknetCoreContract starknetCoreContract;
 
-    // address starknetCoreContractAddress =
-    //     0xde29d060D45901Fb19ED6C6e959EB22d8626708e; // TODO pointing to address on goerli testnet, needs to be removed
-
     constructor(address pedersenAddress, address _starknetCoreContractAddress)
         public
     {
@@ -87,27 +85,7 @@ contract StarknetVerifier {
         return hashvalue;
     }
 
-    // copied and modified from https://github.com/ethereum/solidity-examples/blob/master/src/bits/Bits.sol
-    // Computes the index of the highest bit set in 'number'.
-    // Returns the highest bit set as an 'uint'.
-    // Requires that 'number != 0'.
-    // function highestBitSet(uint256 number)
-    //     public
-    //     pure
-    //     returns (uint256 highest)
-    // {
-    //     require(number != 0);
-    //     uint256 val = number;
-    //     uint256 ONE = uint256(1);
-
-    //     for (uint256 i = 128; i >= 1; i >>= 1) {
-    //         if (val & (((ONE << i) - 1) << i) != 0) {
-    //             highest += i;
-    //             val >>= i;
-    //         }
-    //     }
-    // }
-
+    // this functions connects the contract state root with value of leaf node in the contract proof.
     // state_hash = H(H(H(class_hash, contract_root), contract_nonce), RESERVED)
     function stateHash(
         uint256 classHash,
@@ -143,12 +121,19 @@ contract StarknetVerifier {
         return b;
     }
 
+    // Verify the proof and return the value of the storage variable value otherwise revert.
+    // Non-membership proof is not supported.
+    // Only supports verifiying a proof for a single storage variable value.
     function verifiedStorageValue(
         int256 blockNumber,
         ContractData calldata contractData,
         StarknetProof[] calldata contractProofArray,
         StarknetProof[] calldata storageProofArray
     ) public view returns (uint256 value) {
+        // There are two parts of the proof.
+        // First part verifies the storage proof against the contract stateroot
+        // and H(H(H(class_hash, contract_root), contract_nonce), RESERVED) should be the value(value in the leaf node) for the path in the contract proof.
+        // Second part verifies the contract proof against the state root committed on L1 in the Starknet Core Contract
         console.log("stateRoot", starknetCoreContract.stateRoot());
         require(
             blockNumber == starknetCoreContract.stateBlockNumber(),
@@ -167,6 +152,7 @@ contract StarknetVerifier {
             storageProofArray
         );
 
+        // the contract proof has to be verified against the state root committed on L1 in the Starknet Core Contract
         uint256 expectedStateHash = verifyProof(
             starknetCoreContract.stateRoot(),
             contractData.contractAddress,
@@ -177,6 +163,7 @@ contract StarknetVerifier {
         return storageVarValue;
     }
 
+    // A generic method to verify a proof against a root hash and a path.
     function verifyProof(
         uint256 rootHash,
         uint256 path,
