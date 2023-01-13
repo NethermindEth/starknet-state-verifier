@@ -50,7 +50,7 @@ const localChain: Chain = {
 const { chains, provider } = configureChains(
   [mainnet, goerli, localChain],
   [
-    alchemyProvider({ apiKey: 'Y34XwDhP6AoV7vVR74EFHjtlOJkMYPe4' }),
+    alchemyProvider({ apiKey: 'ozZ0QV1qPAcGx_irBynNiiLkddGb689w' }),
     publicProvider(),
     // jsonRpcProvider({
     //   rpc: (chain) => {
