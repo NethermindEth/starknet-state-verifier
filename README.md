@@ -13,7 +13,7 @@ From the root folder run the following
 ```shell
 yarn install
 cp .env.example .env
-npx hardhat run scripts/deploy.ts
+npx hardhat run <--network yournetwork > scripts/deploy.ts
 ```
 
 ## Run contract tests
@@ -37,3 +37,7 @@ npx hardhat clean
 npx hardhat node
 npx hardhat help
 ```
+
+
+# Acknowledgements
+Pedersen Hash implementation has been borrowed from https://github.com/Kelvyne/starknet-storage-proof-solidity. Many Thanks!
