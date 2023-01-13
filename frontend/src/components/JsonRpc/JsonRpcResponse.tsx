@@ -51,7 +51,7 @@ const JsonRpcResponse = (props: Props) => {
       padding={"16px"}
     >
       {props.data && <Editable maxHeight={"500px"} maxW={"800px"} overflowX={"scroll"} textAlign="left" whiteSpace={"pre"}
-        display={"block"} backgroundColor="gray.100" _hover={{ backgroundColor: "gray.200" }} defaultValue={JSON.stringify(props.data, null, 2)} onSubmit={onSubmitString} >
+        display={"block"} backgroundColor="gray.100" _hover={{ backgroundColor: "gray.200" }} defaultValue={json.stringify(props.data, null, 2)} onSubmit={onSubmitString} >
         <EditablePreview />
         <EditableTextarea height="500px" width="800px" />
         <EditableControls />
