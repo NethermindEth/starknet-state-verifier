@@ -42,7 +42,7 @@ const getProofMethod = {
 }
 const EnsProofCard = () => {
 
-  const gatewayAddress = 'http://139.144.170.180:9545/rpc/v0.2';
+  const gatewayAddress = 'https://pathfinder-goerli.nethermind.io/rpc/v0.2';
 
   const [storageAddress, setStorageAddress] = useState<string>()
   const [contractAddress, setContractAddress] = useState<string>()
