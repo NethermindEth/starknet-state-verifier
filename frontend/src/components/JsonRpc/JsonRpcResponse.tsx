@@ -32,10 +32,6 @@ interface Props {
 
 const JsonRpcResponse = (props: Props) => {
 
-  const onSubmit = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log(event.target.value)
-    //   props.onResult(event.target.value)
-  }
   const onSubmitString = (newValue: string) => {
     try {
       let jsonObject = json.parse(newValue)
