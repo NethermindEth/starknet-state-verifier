@@ -1,5 +1,4 @@
 pragma solidity >=0.6.2 <0.9.0;
-pragma experimental ABIEncoderV2;
 import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
@@ -161,6 +160,16 @@ contract StarknetVerifier {
 
         require(stateHash == expectedStateHash, "State hash is invalid");
         return storageVarValue;
+    }
+
+    function compareBitsWithStartIndexAndLength(
+        uint256 a,
+        uint256 b,
+        uint256 startIndex,
+        uint256 length
+    ) public pure returns (bool) {
+        uint256 mask = (1 << length) - 1;
+        return ((a >> startIndex) & mask) == ((b >> startIndex) & mask);
     }
 
     // A generic method to verify a proof against a root hash and a path.
