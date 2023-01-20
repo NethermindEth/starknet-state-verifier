@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import './App.css'
-import {Box, Flex} from "@chakra-ui/react";
+import {Box, Container, Flex} from "@chakra-ui/react";
 import {starknetKeccak} from "starknet/utils/hash";
 import JsonRpcForm from "./components/JsonRpc/JsonRpcForm";
 
@@ -12,6 +12,7 @@ const STORAGE_HASH = starknetKeccak(STORAGE_VAR_NAME)
 import * as apiSpecImport from './utils/api-spec.json';
 import JsonRpcCard from "./components/JsonRpc/JsonRpcCard";
 import EnsProofCard from "./components/ENS/EnsProofCard";
+import Navbar from './components/Navbar';
 
 function App() {
 
@@ -19,7 +20,8 @@ function App() {
   const apiSpec = apiSpecImport as any
 
   return (
-    <Flex minHeight={"100vh"}>
+    <Box>
+      <Navbar />
       <Flex
         flexDir={"column"}
         minW={"1000px"}
@@ -32,7 +34,7 @@ function App() {
         {/*  </Box>*/}
         {/*)}*/}
       </Flex>
-    </Flex>
+    </Box>
   )
 }
 

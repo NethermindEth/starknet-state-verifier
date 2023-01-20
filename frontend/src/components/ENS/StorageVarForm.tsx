@@ -70,7 +70,10 @@ const StorageVarForm = (props: Props) => {
                 border={"1px solid #ccc"}
                 borderRadius={"4px"}
                 w={"250px"}
-                type="text" id={"storage-args"} name={"storage-args"}/>
+                type="text" 
+                id={"storage-args"} 
+                name={"storage-args"}
+              />
             </HStack>
           </Flex>
           <Box>
