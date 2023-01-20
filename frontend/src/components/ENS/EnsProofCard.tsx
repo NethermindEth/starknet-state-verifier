@@ -1,5 +1,5 @@
 import JsonRpcForm from "../JsonRpc/JsonRpcForm";
-import { Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, useColorModeValue, VStack } from "@chakra-ui/react";
 import React, { Key, useEffect, useState } from "react";
 import JsonRpcResponse from "../JsonRpc/JsonRpcResponse";
 import { ChevronRightIcon, ChevronUpIcon } from '@chakra-ui/icons'
@@ -50,6 +50,8 @@ const EnsProofCard = () => {
   const [starknetCommittedBlockNumber, setStarknetCommittedBlockNumber] = useState<string>()
   const [proof, setProof] = useState<string>()
 
+  const borderColor = useColorModeValue("gray.800", "white.200")
+
   return (
     <>
       <VStack
@@ -57,9 +59,9 @@ const EnsProofCard = () => {
         borderRadius={"4px"}
         alignItems={"flex-start"}
       >
-        <VStack w={"100%"}>
+        <VStack w={"100%"} p={4} border={`1px dashed`}>
           <StorageVarForm setStorageAddress={setStorageAddress} />
-          {storageAddress && <Text fontSize={"12px"} w={"100%"}>{storageAddress}</Text>}
+          {storageAddress && <Text fontSize={"xs"} w={"100%"}>Calulated Storage Address: {storageAddress}</Text>}
         </VStack>
         <HStack w={"100%"}>
           <FormLabel
@@ -71,7 +73,14 @@ const EnsProofCard = () => {
             {gatewayAddress}
           </Text>
         </HStack>
-        <GetProofForm onResult={setProof} setContractAddress={setContractAddress} setStorageAddress={setStorageAddress} setEthereumBlockNumber={setEthereumBlockNumber} setStarknetCommittedBlockNumber={setStarknetCommittedBlockNumber} />
+        <GetProofForm 
+          onResult={setProof} 
+          setContractAddress={setContractAddress} 
+          setStorageAddress={setStorageAddress} 
+          storageAddress={storageAddress}
+          setEthereumBlockNumber={setEthereumBlockNumber} 
+          setStarknetCommittedBlockNumber={setStarknetCommittedBlockNumber} 
+        />
         {proof && <JsonRpcResponse data={proof} onResult={setProof} />}
         <ConnectWallet />
         {proof && <VerifyProof ethereumBlockNumber={ethereumBlockNumber} starknetCommittedBlockNumber={starknetCommittedBlockNumber} storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}

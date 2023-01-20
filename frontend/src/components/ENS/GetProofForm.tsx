@@ -17,6 +17,7 @@ interface Props {
   setEthereumBlockNumber: (blockNumber: string) => void;
   setContractAddress: (address: string) => void;
   setStorageAddress: (address: string) => void;
+  storageAddress?: string;
 }
 
 
@@ -118,6 +119,7 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
             borderRadius={"4px"}
             w={"250px"}
             fontSize={"12px"}
+            value={props.storageAddress}
             type="text" id={"storagevar-address"} name={"storagevar-address"} />
         </HStack>
         <HStack>
