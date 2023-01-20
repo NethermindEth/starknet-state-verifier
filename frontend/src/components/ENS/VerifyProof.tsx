@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BigNumberish, Signer } from "ethers";
 import { useContractRead } from 'wagmi'
-import { Box, Button, FormLabel, Heading, HStack, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, FormLabel, Heading, HStack, Input, Text, Tooltip } from "@chakra-ui/react";
 import StarknetVerifier from "../../abi/StarknetVerifier.json";
 import { Spinner } from '@chakra-ui/react'
 
@@ -175,34 +175,41 @@ const VerifyProof = (props: Props) => {
     }
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const _verifier = formData.get('verifier') as string;
-    setVerifierAddress(_verifier);
+  const handleSubmit = () => {
     setSubmit(!submit);
     fetchResult();
   }
 
   return (
-    <>
-      <Heading as={"h3"}>Verification</Heading>
-      <form onSubmit={handleSubmit}>
-        <HStack>
+    <Box w={"100%"}>
+      <Heading variant={"h3"} fontSize={"2xl"}>Verification</Heading>
+        <Box>
+        <Flex w={"100%"} alignItems={"center"}>
           <FormLabel
             htmlFor={"verifier"}
-            fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          > {"Verifier address: "}</FormLabel>
+            fontSize={"sm"}
+            fontWeight={"bold"}
+            margin={"0px"}
+            w={"20%"}
+          > 
+            <Tooltip
+              label={"Contract Address for the verifier deployed on L1 (Ethereum)."}
+            >
+              Verifier's Address
+            </Tooltip>
+          </FormLabel>
           <Input
-            padding={"8px"}
-            border={"1px solid #ccc"}
-            borderRadius={"4px"}
-            w={"250px"}
-            fontSize={"12px"}
-            type="text" id={"verifier"} name={"verifier"} defaultValue={verifierAddress} />
-        </HStack>
+            w={"80%"}
+            fontSize={"sm"}
+            type="text" 
+            id={"verifier"} 
+            name={"verifier"} 
+            value={verifierAddress} 
+            onChange={(e) => {
+              setVerifierAddress(e.target.value)
+            }}
+          />
+        </Flex>
         {/* <HStack>
           <FormLabel
             htmlFor={"state-root"}
@@ -220,18 +227,16 @@ const VerifyProof = (props: Props) => {
         </HStack> */}
         <Box>
           <Button
-            margin={"8px 0 0"}
-            padding={"8px"}
-            border={"none"}
-            borderRadius={"4px"}
-            backgroundColor={"#333"}
-            color={"#fff"}
-            fontSize={"14px"}
+            my={"10px"}
             fontWeight={"600"}
             cursor={"pointer"}
-            type="submit">Verify proof</Button>
+            colorScheme={"blue"}
+            onClick={handleSubmit}
+          >
+            Verify proof
+          </Button>
         </Box>
-      </form>
+      </Box>
       <Box>
         <Heading as={"h5"}>Verified Storage Value  </Heading>
         {!isLoading && <Text> against ethereum block # {props.ethereumBlockNumber} and starknet block # {props.starknetCommittedBlockNumber} </Text>}
@@ -239,7 +244,7 @@ const VerifyProof = (props: Props) => {
 
         {isLoading && <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl' />}
       </Box>
-    </>
+    </Box>
 
   );
 };

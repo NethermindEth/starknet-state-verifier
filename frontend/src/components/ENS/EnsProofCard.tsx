@@ -72,12 +72,6 @@ const EnsProofCard = () => {
     })
   }
 
-  const [storageAddress, setStorageAddress] = useState<string>()
-  const [contractAddress, setContractAddress] = useState<string>()
-  const [ethereumBlockNumber, setEthereumBlockNumber] = useState<string>()
-  const [starknetCommittedBlockNumber, setStarknetCommittedBlockNumber] = useState<string>()
-  const [proof, setProof] = useState<string>()
-
   const borderColor = useColorModeValue("gray.600", "whiteAlpha.600")
 
   return (
@@ -109,16 +103,19 @@ const EnsProofCard = () => {
         <GetProofForm 
           state={proofCardState}
           mutateProofCardState={mutateSetProofCardState}
-          onResult={setProof} 
-          setContractAddress={setContractAddress} 
-          setStorageAddress={setStorageAddress} 
-          storageAddress={storageAddress}
-          setEthereumBlockNumber={setEthereumBlockNumber} 
-          setStarknetCommittedBlockNumber={setStarknetCommittedBlockNumber} 
+          setState={setProofCardState}
         />
-        {proof && <JsonRpcResponse data={proof} onResult={setProof} />}
-        <ConnectWallet />
-        {proof && <VerifyProof ethereumBlockNumber={ethereumBlockNumber} starknetCommittedBlockNumber={starknetCommittedBlockNumber} storageAddress={storageAddress} contractAddress={contractAddress} proof={proof} />}
+        {proofCardState.proof && <JsonRpcResponse 
+          data={proofCardState.proof} 
+          onResult={(proof: string) => mutateSetProofCardState("proof", proof)} 
+        />}
+        {proofCardState.proof && <VerifyProof 
+          ethereumBlockNumber={proofCardState.ethereumBlockNumber} 
+          starknetCommittedBlockNumber={proofCardState.starknetCommitmentBlockNumber} 
+          storageAddress={proofCardState.storageAddress} 
+          contractAddress={proofCardState.contractAddress} 
+          proof={proofCardState.proof} 
+        />}
       </VStack>
       <Divider />
     </>);
