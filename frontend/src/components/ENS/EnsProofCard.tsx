@@ -52,14 +52,6 @@ const EnsProofCard = () => {
 
   return (
     <>
-      <HStack
-      >
-        <Heading as={"h3"}
-          fontSize={"18px"}
-          fontWeight={"600"}
-        >ENS Resolution
-        </Heading>
-      </HStack>
       <VStack
         marginY={"10px"}
         borderRadius={"4px"}

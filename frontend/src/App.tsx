@@ -29,13 +29,15 @@ function App() {
         minH={"90vh"}
         py={"2"}
       >
-        <EnsProofCard/>
-        {/*  Not used.*/}
-        {/*{apiSpec.methods.map((method: { name: string; params: string[] }, index: React.Key) =>*/}
-        {/*  <Box key={method.name}>*/}
-        {/*    <JsonRpcCard method={method} key={index}/>*/}
-        {/*  </Box>*/}
-        {/*)}*/}
+        <Box maxW={"5xl"} width={"100%"}>
+          <EnsProofCard/>
+          {/*  Not used.*/}
+          {/*{apiSpec.methods.map((method: { name: string; params: string[] }, index: React.Key) =>*/}
+          {/*  <Box key={method.name}>*/}
+          {/*    <JsonRpcCard method={method} key={index}/>*/}
+          {/*  </Box>*/}
+          {/*)}*/}
+        </Box>
       </Flex>
     </Box>
   )
