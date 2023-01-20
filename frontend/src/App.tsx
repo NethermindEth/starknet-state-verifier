@@ -24,7 +24,10 @@ function App() {
       <Navbar />
       <Flex
         flexDir={"column"}
-        minW={"1000px"}
+        width={"100%"}
+        alignItems={"center"}
+        minH={"90vh"}
+        py={"2"}
       >
         <EnsProofCard/>
         {/*  Not used.*/}
