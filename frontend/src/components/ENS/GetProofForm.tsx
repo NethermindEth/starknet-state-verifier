@@ -1,6 +1,6 @@
 import React, { Key, useEffect, useState } from 'react';
 import jsonRpcCall from "../../utils/RpcCall";
-import { Box, Button, Flex, FormLabel, Heading, HStack, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, FormLabel, Heading, HStack, Input, Tooltip, VStack } from "@chakra-ui/react";
 import { useBlockNumber, useContractRead, useProvider } from 'wagmi'
 import StarknetCoreContract from "../../abi/StarknetCoreContract.json";
 import { BigNumber } from 'ethers';
@@ -9,6 +9,7 @@ import { ethers } from 'ethers';
 
 import { useAccount, useConnect } from 'wagmi'
 import { InjectedConnector } from "wagmi/connectors/injected";
+import { EnsProofCardState, EnsProofCardStateKeys } from './EnsProofCard';
 
 
 interface Props {
@@ -18,11 +19,22 @@ interface Props {
   setContractAddress: (address: string) => void;
   setStorageAddress: (address: string) => void;
   storageAddress?: string;
+  state: EnsProofCardState;
+  mutateProofCardState: (key: EnsProofCardStateKeys, value: string) => any;
 }
 
 
-const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
-  const { onResult } = props;
+const GetProofForm: React.FC<Props> = ({
+  onResult, 
+  setStarknetCommittedBlockNumber,
+  setEthereumBlockNumber,
+  setContractAddress,
+  setStorageAddress,
+  storageAddress,
+  state,
+  mutateProofCardState
+}) => {
+
   const [isLoading, setIsLoading] = useState(false);
   const [starknetCoreContractAddress, setStarknetCoreContractAddress] = useState<string>('0xde29d060D45901Fb19ED6C6e959EB22d8626708e')
   const provider = useProvider()
@@ -57,12 +69,12 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
     const contractAddress = formData.get('contract-address') as string;
     const storageAddress = formData.get('storagevar-address') as string;
     setStarknetCoreContractAddress(formData.get('corecontract-address') as string);
-    props.setStorageAddress(storageAddress);
-    props.setContractAddress(contractAddress);
+    setStorageAddress(storageAddress);
+    setContractAddress(contractAddress);
 
     setIsLoading(true);
     const ethereumBlockNumber = getLatestEthereumBlockNumber().then((ethereumBlockNumber) => {
-      props.setEthereumBlockNumber(ethereumBlockNumber.toString());
+      setEthereumBlockNumber(ethereumBlockNumber.toString());
       getStarknetCommittedBlockNumber(ethereumBlockNumber).then((committedBlockNumber) => {
         console.log('readCoreContract block #', committedBlockNumber);
         let blockArg = { 'block_number': committedBlockNumber }
@@ -75,7 +87,7 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
         // Call the JSON-RPC method with the given params
         // and pass the result to the onResult callback
         jsonRpcCall("pathfinder_getProof", args).then((result) => {
-          props.setStarknetCommittedBlockNumber(committedBlockNumber.toString());
+          setStarknetCommittedBlockNumber(committedBlockNumber.toString());
           onResult(result);
           setIsLoading(false);
         });
@@ -91,53 +103,73 @@ const GetProofForm: React.FunctionComponent<Props> = (props: Props) => {
       width={"100%"}
     >
       <form onSubmit={handleSubmit}>
-        <HStack>
+        <Flex my={"10px"} alignItems={"center"}>
           <FormLabel
             htmlFor={"contract-address"}
-            fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          >Contract Address</FormLabel>
+            fontSize={"sm"}
+            fontWeight={"bold"}
+            margin={"0px"}
+            w={"20%"}
+          >
+            <Tooltip label={"Contract Address which is on L2"}>
+              Contract Address
+            </Tooltip>
+          </FormLabel>
           <Input
             padding={"8px"}
             border={"1px solid #ccc"}
             borderRadius={"4px"}
             w={"250px"}
-            fontSize={"12px"}
-            type="text" id={"contract-address"} name={"contract-address"} />
-        </HStack>
-        <HStack>
+            fontSize={"sm"}
+            type="text" 
+            id={"contract-address"} 
+            name={"contract-address"}
+            onChange={(e) => mutateProofCardState("contractAddress", e.target.value)}
+            value={state?.contractAddress}
+          />
+        </Flex>
+        <Flex my={"10px"} alignItems={"center"}>
           <FormLabel
             htmlFor={"storagevar-address"}
-            fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          >Storage variable address</FormLabel>
+            fontSize={"sm"}
+            fontWeight={"bold"}
+            margin={"0px"}
+            w={"20%"}
+          >
+            Storage variable address
+          </FormLabel>
           <Input
             padding={"8px"}
             border={"1px solid #ccc"}
             borderRadius={"4px"}
             w={"250px"}
-            fontSize={"12px"}
-            value={props.storageAddress}
-            type="text" id={"storagevar-address"} name={"storagevar-address"} />
-        </HStack>
-        <HStack>
+            fontSize={"sm"}
+            value={state?.storageAddress}
+            readOnly
+            type="text" 
+            id={"storagevar-address"} 
+            name={"storagevar-address"} 
+          />
+        </Flex>
+        <Flex my={"10px"} alignItems={"center"}>
           <FormLabel
             htmlFor={"block-tag"}
-            fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          >StarknetCoreContract Address</FormLabel>
+            fontSize={"sm"}
+            fontWeight={"bold"}
+            margin={"0px"}
+            w={"20%"}
+          >
+            StarknetCoreContract Address
+          </FormLabel>
           <Input
             defaultValue={starknetCoreContractAddress}
             padding={"8px"}
             border={"1px solid #ccc"}
             borderRadius={"4px"}
             w={"250px"}
-            fontSize={"12px"}
+            fontSize={"sm"}
             type="text" id={"corecontract-address"} name={"corecontract-address"} />
-        </HStack>
+        </Flex>
         <Box>
           <Button
             margin={"8px 0 0"}

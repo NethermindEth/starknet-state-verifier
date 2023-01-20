@@ -1,5 +1,5 @@
 import JsonRpcForm from "../JsonRpc/JsonRpcForm";
-import { Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, useColorModeValue, VStack } from "@chakra-ui/react";
+import { border, Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, useColorModeValue, VStack } from "@chakra-ui/react";
 import React, { Key, useEffect, useState } from "react";
 import JsonRpcResponse from "../JsonRpc/JsonRpcResponse";
 import { ChevronRightIcon, ChevronUpIcon } from '@chakra-ui/icons'
@@ -40,9 +40,37 @@ const getProofMethod = {
     }
   ]
 }
+
+
+export type EnsProofCardStateKeys =  "storageAddress" | "contractAddress" | "ethereumBlockNumber" | "starknetCommitmentBlockNumber" | "proof" ;
+export interface EnsProofCardState {
+    storageAddress?: string;
+    contractAddress?: string;
+    ethereumBlockNumber?: string;
+    starknetCommitmentBlockNumber?: string;
+    proof?: string;
+}
+
 const EnsProofCard = () => {
 
   const gatewayAddress = 'https://pathfinder-goerli.nethermind.io/rpc/v0.2';
+
+  const [
+    proofCardState, setProofCardState
+  ] = useState<EnsProofCardState>({
+    contractAddress: "",
+    ethereumBlockNumber: "",
+    proof: "",
+    starknetCommitmentBlockNumber: "",
+    storageAddress: ""
+  });
+
+  const mutateSetProofCardState = (key: EnsProofCardStateKeys, value: string) => {
+    setProofCardState({
+      ...proofCardState,
+      [key]: value
+    })
+  }
 
   const [storageAddress, setStorageAddress] = useState<string>()
   const [contractAddress, setContractAddress] = useState<string>()
@@ -50,7 +78,7 @@ const EnsProofCard = () => {
   const [starknetCommittedBlockNumber, setStarknetCommittedBlockNumber] = useState<string>()
   const [proof, setProof] = useState<string>()
 
-  const borderColor = useColorModeValue("gray.800", "white.200")
+  const borderColor = useColorModeValue("gray.600", "whiteAlpha.600")
 
   return (
     <>
@@ -59,21 +87,28 @@ const EnsProofCard = () => {
         borderRadius={"4px"}
         alignItems={"flex-start"}
       >
-        <VStack w={"100%"} p={4} border={`1px dashed`}>
-          <StorageVarForm setStorageAddress={setStorageAddress} />
-          {storageAddress && <Text fontSize={"xs"} w={"100%"}>Calulated Storage Address: {storageAddress}</Text>}
+        <VStack w={"100%"} p={4} border={`1px dashed`} borderColor={borderColor}>
+          <StorageVarForm setStorageAddress={
+            (address: string) => mutateSetProofCardState("storageAddress", address)
+            } 
+          />
+          {
+            proofCardState?.storageAddress && 
+            <Text fontSize={"xs"} w={"100%"}>Calulated Storage Address: {proofCardState?.storageAddress}</Text>
+          }
         </VStack>
         <HStack w={"100%"}>
-          <FormLabel
+          <Text
             fontWeight={"400"}
-            fontSize={"12px"}
-            w={"150px"}
-          >Pathfinder address</FormLabel>
-          <Text fontSize={"12px"} textAlign={"left"}>
+            fontSize={"sm"}
+          >Pathfinder address: </Text>
+          <Text fontSize={"sm"} textAlign={"left"} fontWeight={"bold"}>
             {gatewayAddress}
           </Text>
         </HStack>
         <GetProofForm 
+          state={proofCardState}
+          mutateProofCardState={mutateSetProofCardState}
           onResult={setProof} 
           setContractAddress={setContractAddress} 
           setStorageAddress={setStorageAddress} 

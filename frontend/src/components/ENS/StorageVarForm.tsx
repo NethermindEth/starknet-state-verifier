@@ -1,4 +1,4 @@
-import {Box, Button, Card, Collapse, Divider, Flex, FormLabel, Heading, HStack, Input, useToast, VStack} from "@chakra-ui/react";
+import {Box, Button, Card, Collapse, Divider, Flex, FormLabel, Heading, HStack, Input, Tooltip, useToast, VStack} from "@chakra-ui/react";
 import React, {Key, useEffect, useState} from "react";
 import {pedersen, starknetKeccak} from "starknet/utils/hash";
 import {toFelt, toHex} from "starknet/utils/number";
@@ -66,7 +66,11 @@ const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
           htmlFor={"storage-name"}
           fontWeight={"400"}
           fontSize={"sm"}
-        >Storage variable name </FormLabel>
+        >
+          <Tooltip label={"It is the storage variable name which is defined in the source cairo contract."}>
+            Storage variable name
+          </Tooltip>
+        </FormLabel>
         <Input
           variant={"outline"}
           fontSize={"sm"}
@@ -84,7 +88,11 @@ const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
           htmlFor={"storage-name"}
           fontWeight={"400"}
           fontSize={"sm"}
-        >Storage variable arguments</FormLabel>
+        >
+          <Tooltip label={"Enter your storage variable arguments here comma seperated. e.g two args as: 0x034, 0x343"}>
+            Storage variable arguments
+          </Tooltip>
+        </FormLabel>
         <Input
           variant={"outline"}
           padding={"8px"}
