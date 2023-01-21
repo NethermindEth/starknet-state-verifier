@@ -13,6 +13,7 @@ import * as apiSpecImport from './utils/api-spec.json';
 import JsonRpcCard from "./components/JsonRpc/JsonRpcCard";
 import EnsProofCard from "./components/ENS/EnsProofCard";
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
           {/*)}*/}
         </Box>
       </Flex>
+      <Footer />
     </Box>
   )
 }

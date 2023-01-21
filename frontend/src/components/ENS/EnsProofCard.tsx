@@ -48,7 +48,16 @@ export interface EnsProofCardState {
     contractAddress?: string;
     ethereumBlockNumber?: string;
     starknetCommitmentBlockNumber?: string;
-    proof?: string;
+    proof?: {
+      contract_proof: any[],
+      contract_data?: {
+        class_hash: string,
+        nonce: string,
+        root: string,
+        contract_state_hash_version: string,
+        storage_proofs: any[]
+      }
+    };
 }
 
 const EnsProofCard = () => {
@@ -60,7 +69,6 @@ const EnsProofCard = () => {
   ] = useState<EnsProofCardState>({
     contractAddress: "",
     ethereumBlockNumber: "",
-    proof: "",
     starknetCommitmentBlockNumber: "",
     storageAddress: ""
   });
@@ -109,15 +117,10 @@ const EnsProofCard = () => {
           data={proofCardState.proof} 
           onResult={(proof: string) => mutateSetProofCardState("proof", proof)} 
         />}
-        {proofCardState.proof && <VerifyProof 
-          ethereumBlockNumber={proofCardState.ethereumBlockNumber} 
-          starknetCommittedBlockNumber={proofCardState.starknetCommitmentBlockNumber} 
-          storageAddress={proofCardState.storageAddress} 
-          contractAddress={proofCardState.contractAddress} 
-          proof={proofCardState.proof} 
+        {proofCardState.proof && <VerifyProof
+          state={proofCardState}
         />}
       </VStack>
-      <Divider />
     </>);
 }
 
