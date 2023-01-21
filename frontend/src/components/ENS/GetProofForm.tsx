@@ -1,9 +1,9 @@
-import React, { Key, useEffect, useState } from 'react';
+import React, { Key, useEffect, useMemo, useState } from 'react';
 import jsonRpcCall from "../../utils/RpcCall";
-import { Box, Button, Flex, FormLabel, Heading, HStack, Input, Tooltip, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, FormLabel, Heading, HStack, Input, Text, Tooltip, useColorModeValue, useToast, VStack } from "@chakra-ui/react";
 import { useBlockNumber, useContractRead, useProvider } from 'wagmi'
 import StarknetCoreContract from "../../abi/StarknetCoreContract.json";
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { Spinner } from '@chakra-ui/react'
 import { ethers } from 'ethers';
 
@@ -29,6 +29,7 @@ const GetProofForm: React.FC<Props> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [starknetCoreContractAddress, setStarknetCoreContractAddress] = useState<string>('0xde29d060D45901Fb19ED6C6e959EB22d8626708e');
+  const [coreContractRootState, setContractRootState] = useState<string>("");
 
   const provider = useProvider();
 
@@ -36,16 +37,43 @@ const GetProofForm: React.FC<Props> = ({
     return await provider.getBlockNumber();
   }
 
-  const getStarknetCommittedBlockNumber = async (ethereumBlockNumber: number): Promise<number> => {
-
-    const readCoreContract = new ethers.Contract(
+  const makeCoreContractInstance = () => {
+    return new ethers.Contract(
       starknetCoreContractAddress,
       StarknetCoreContract.abi,
       provider
     );
+  }
+
+  const getStarknetCommittedBlockNumber = async (ethereumBlockNumber: number): Promise<number> => {
+    const readCoreContract = makeCoreContractInstance();
     const starknetCommittedBlock = await readCoreContract.stateBlockNumber({ blockTag: ethereumBlockNumber })
     return BigNumber.from(starknetCommittedBlock).toNumber();
   }
+
+  const getRootState = async () => {
+    const readCoreContract = makeCoreContractInstance();
+    const stateRoot: BigNumberish = await readCoreContract.stateRoot();
+    setContractRootState(stateRoot.toString());
+  }
+
+  const [currentCount, setCount] = useState(1);
+
+  const timer = () => { getRootState(); setCount(currentCount + 1) };
+
+  // Required for First Load Trigger
+  useEffect(() => {
+    getRootState();
+  }, [])
+
+  // This calls as per interval timer
+  useEffect(() => {
+   
+    const id = setInterval(timer, 10000);
+    
+    return () => clearInterval(id);
+
+   }, [coreContractRootState]);
 
   const { connector: activeConnector, isConnected } = useAccount();
 
@@ -109,6 +137,8 @@ const GetProofForm: React.FC<Props> = ({
 
     setIsLoading(false);
   };
+
+  const stateRootColor = useColorModeValue("green", "palegreen");
 
   return (
     <Flex
@@ -187,6 +217,7 @@ const GetProofForm: React.FC<Props> = ({
           name={"corecontract-address"} 
         />
       </Flex>
+      <Text my={"10px"}>Core Contract State Root: <Text as={"span"} fontWeight={"900"} color={stateRootColor}>{coreContractRootState}</Text></Text>
       <Box>
         <Button 
           variant={"solid"}
