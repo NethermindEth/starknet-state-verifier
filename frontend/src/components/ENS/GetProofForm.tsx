@@ -55,6 +55,7 @@ const GetProofForm: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [starknetCoreContractAddress, setStarknetCoreContractAddress] =
     useState<string>("0xde29d060D45901Fb19ED6C6e959EB22d8626708e");
+
   const [coreContractRootState, setContractRootState] =
     useState<StarknetCoreContractState>({
       stateBlockNumber: BigNumber.from("0"),
@@ -355,7 +356,7 @@ const GetProofForm: React.FC<Props> = ({
               label={"Pathfinder is not synced upto L1 core starknet contract."}
               color={"red"}
             >
-             <Box
+              <Box
                 display={"flex"}
                 flexDir={"column"}
                 alignItems={"center"}

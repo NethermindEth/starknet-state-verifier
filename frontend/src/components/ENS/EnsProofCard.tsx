@@ -42,22 +42,22 @@ const getProofMethod = {
 }
 
 
-export type EnsProofCardStateKeys =  "storageAddress" | "contractAddress" | "ethereumBlockNumber" | "starknetCommitmentBlockNumber" | "proof" ;
+export type EnsProofCardStateKeys = "storageAddress" | "contractAddress" | "ethereumBlockNumber" | "starknetCommitmentBlockNumber" | "proof";
 export interface EnsProofCardState {
-    storageAddress?: string;
-    contractAddress?: string;
-    ethereumBlockNumber?: string;
-    starknetCommitmentBlockNumber?: string;
-    proof?: {
-      contract_proof: any[],
-      contract_data?: {
-        class_hash: string,
-        nonce: string,
-        root: string,
-        contract_state_hash_version: string,
-        storage_proofs: any[]
-      }
-    };
+  storageAddress?: string;
+  contractAddress?: string;
+  ethereumBlockNumber?: string;
+  starknetCommitmentBlockNumber?: string;
+  proof?: {
+    contract_proof: any[],
+    contract_data?: {
+      class_hash: string,
+      nonce: string,
+      root: string,
+      contract_state_hash_version: string,
+      storage_proofs: any[]
+    }
+  };
 }
 
 const EnsProofCard = () => {
@@ -67,7 +67,7 @@ const EnsProofCard = () => {
   const [
     proofCardState, setProofCardState
   ] = useState<EnsProofCardState>({
-    contractAddress: "",
+    contractAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7", // default eth erc20 contract
     ethereumBlockNumber: "",
     starknetCommitmentBlockNumber: "",
     storageAddress: ""
@@ -92,10 +92,10 @@ const EnsProofCard = () => {
         <VStack w={"100%"} p={4} border={`1px dashed`} borderColor={borderColor}>
           <StorageVarForm setStorageAddress={
             (address: string) => mutateSetProofCardState("storageAddress", address)
-            } 
+          }
           />
           {
-            proofCardState?.storageAddress && 
+            proofCardState?.storageAddress &&
             <Text fontSize={"xs"} w={"100%"}>Calulated Storage Address: {proofCardState?.storageAddress}</Text>
           }
         </VStack>
@@ -108,14 +108,14 @@ const EnsProofCard = () => {
             {gatewayAddress}
           </Text>
         </HStack>
-        <GetProofForm 
+        <GetProofForm
           state={proofCardState}
           mutateProofCardState={mutateSetProofCardState}
           setState={setProofCardState}
         />
-        {proofCardState.proof && <JsonRpcResponse 
-          data={proofCardState.proof} 
-          onResult={(proof: string) => mutateSetProofCardState("proof", proof)} 
+        {proofCardState.proof && <JsonRpcResponse
+          data={proofCardState.proof}
+          onResult={(proof: string) => mutateSetProofCardState("proof", proof)}
         />}
         {proofCardState.proof && <VerifyProof
           state={proofCardState}
