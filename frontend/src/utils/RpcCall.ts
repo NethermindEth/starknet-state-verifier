@@ -17,7 +17,7 @@ let nextRequestId = 1;
  */
 async function jsonRpcCall(methodName: string, params: any[]): Promise<any> {
   // Create the JSON-RPC request object
-  console.log('jsonRpcCall', methodName, params);
+  // console.log('jsonRpcCall', methodName, params);
   const request = {
     jsonrpc: JSON_RPC_VERSION,
     method: methodName,
