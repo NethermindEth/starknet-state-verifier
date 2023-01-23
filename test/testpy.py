@@ -9,10 +9,10 @@ from web3.middleware import geth_poa_middleware
 from starkware.starknet.services.api.gateway.transaction import Deploy, InvokeFunction
 from starkware.starknet.compiler.compile import compile_starknet_files, get_selector_from_name
 from starkware.cairo.lang.vm.crypto import pedersen_hash
-from starkware.starknet.public.abi import get_selector_from_name, get_storage_var_address
+from starkware.starknet.public.abi import get_selector_from_name, get_storage_var_address, starknet_keccak
 
 
-print("get_storage_var_address ", get_storage_var_address('_implementation'))
+print("initializer ", get_storage_var_address('_initializer'))
 # print("pedersen_hash ", hex(pedersen_hash(
 #     0x1e240, 0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091) + 251))
 

@@ -3,6 +3,13 @@ import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
 
+interface IResolverService {
+    function addr(bytes32 node)
+        external
+        view
+        returns (L2StateProof memory proof);
+}
+
 // Starknet Core Contract Minimal Interface
 // Defining the parts of the core contract interface that we need. i.e. stateRoot and stateBlockNumber
 interface StarknetCoreContract {
@@ -19,6 +26,17 @@ interface StarknetCoreContract {
 
 // Starknet Proof Verifier. This contract verifies a Starknet proof for a contract and a storage address/value
 contract StarknetVerifier {
+    string[] public gateways;
+    address public l2resolver;
+
+    error OffchainLookup(
+        address sender,
+        string[] urls,
+        bytes callData,
+        bytes4 callbackFunction,
+        bytes extraData
+    );
+
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
 
@@ -55,14 +73,117 @@ contract StarknetVerifier {
     PedersenHash pedersen;
     StarknetCoreContract starknetCoreContract;
 
-    constructor(address pedersenAddress, address _starknetCoreContractAddress)
-        public
-    {
+    // uint256 MASK_250 = (2**250) - 1; // to simulate sn_keccak
+    uint256 storageVarName =
+        0x29539a1d23af1810c48a07fe7fc66a3b34fbc8b37e9b3cdb97bb88ceab7e4bf; // sn_keccak of 'resolver' in https://github.com/starknet-id/ens_resolver/blob/3577d3bf3e309614dbec16aca56b7cade2bac949/src/main.cairo#L7
+
+    constructor(
+        address pedersenAddress,
+        address _starknetCoreContractAddress,
+        string[] memory _gateways,
+        address _l2resolver
+    ) public {
         pedersen = PedersenHash(pedersenAddress);
         starknetCoreContract = StarknetCoreContract(
             _starknetCoreContractAddress
         );
+        gateways = _gateways;
+        l2resolver = _l2resolver;
     }
+
+    /************************************ENS STUFF */
+    function getl2Resolver() external view returns (address) {
+        return l2resolver;
+    }
+
+    // returns the address of the storage within the starknet contract
+    function calculateDomainStorageVarAddressFor(uint256 domain)
+        external
+        view
+        returns (uint256)
+    {
+        return hash(storageVarName, domain);
+    }
+
+    function addr(bytes32 node) public view returns (address) {
+        return _addr(node, StarknetVerifier.addrWithProof.selector);
+    }
+
+    function addr(bytes32 node, uint256 coinType)
+        public
+        view
+        returns (bytes memory)
+    {
+        if (coinType == 9004) {
+            // TODO: not sure this should be 60 for ETH or 9004 for starknet
+            return
+                addressToBytes(
+                    _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
+                );
+        } else {
+            return addressToBytes(address(0));
+        }
+    }
+
+    function _addr(bytes32 node, bytes4 selector)
+        private
+        view
+        returns (address)
+    {
+        // uint256 storageVarAddress = calculateDomainStorageVarAddressFor(
+        //     uint256(node)
+        // );
+        bytes memory callData = abi.encodeWithSelector(
+            IResolverService.addr.selector,
+            node
+        );
+        revert OffchainLookup(
+            address(this),
+            gateways,
+            callData,
+            selector,
+            abi.encode(node)
+        );
+    }
+
+    function addrWithProof(bytes calldata response, bytes calldata extraData)
+        external
+        view
+        returns (address)
+    {
+        return _addrWithProof(response, extraData);
+    }
+
+    function bytesAddrWithProof(
+        bytes calldata response,
+        bytes calldata extraData
+    ) external view returns (bytes memory) {
+        return addressToBytes(_addrWithProof(response, extraData));
+    }
+
+    function _addrWithProof(bytes calldata response, bytes calldata extraData)
+        internal
+        view
+        returns (address)
+    {
+        // L2StateProof memory proof = abi.decode(response, (L2StateProof));
+        // bytes32 node = abi.decode(extraData, (bytes32));
+        // require(verifyStateRootProof(proof), "Invalid state root");
+        // bytes32 slot = keccak256(abi.encodePacked(node, uint256(1)));
+        // bytes32 value = getStorageValue(l2resolver, slot, proof);
+        // return address(uint160(uint256(value)));
+        console.log("_addrWithProof");
+        return address(uint160(uint256(-1)));
+    }
+
+    function addressToBytes(address a) internal pure returns (bytes memory b) {
+        b = new bytes(20);
+        assembly {
+            mstore(add(b, 32), mul(a, exp(256, 12)))
+        }
+    }
+
+    /************************************END OF ENS STUFF */
 
     function hashForSingleProofNode(StarknetProof memory proof)
         public

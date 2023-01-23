@@ -119,7 +119,6 @@ const VerifyProof = (props: Props) => {
     if (props.proof.contract_data !== undefined) {
       console.log('contract data', props.proof.contract_data)
       if (props.proof.contract_data.storage_proofs !== undefined) {
-        console.log('storage proofs undefined')
         props.proof.contract_data.storage_proofs.forEach((storage_proof: any) => {
           let myStorageProof: any = [];
           storage_proof.forEach((element: any) => {
