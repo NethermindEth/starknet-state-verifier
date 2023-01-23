@@ -1,25 +1,25 @@
-import {Box, Button, Card, Collapse, Divider, Flex, FormLabel, Heading, HStack, Input, Tooltip, useToast, VStack} from "@chakra-ui/react";
-import React, {Key, useEffect, useState} from "react";
-import {pedersen, starknetKeccak} from "starknet/utils/hash";
-import {toFelt, toHex} from "starknet/utils/number";
+import { Box, Button, Card, Collapse, Divider, Flex, FormLabel, Heading, HStack, Input, Tooltip, useToast, VStack } from "@chakra-ui/react";
+import React, { Key, useEffect, useState } from "react";
+import { pedersen, starknetKeccak } from "starknet/utils/hash";
+import { toFelt, toHex } from "starknet/utils/number";
 
 
 interface Props {
   setStorageAddress: (address: string) => void
 }
 
-const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
+const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
 
   const toast = useToast();
 
   const [storageVarFormState, setStorageVarFormState] = useState({
-    name: "",
-    args: ""
+    name: "ERC20_balances", // some defaults for this contract -> 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
+    args: "0x01C62c52C1709aCB3EB9195594E39C04323658463Cfe0c641e39b99a83ba11a1"
   });
 
   useEffect(() => {
     const address = computeStorageAddress(
-      storageVarFormState.name, 
+      storageVarFormState.name,
       storageVarFormState?.args?.split(',')
     );
     setStorageAddress(address);
@@ -28,30 +28,30 @@ const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
   const computeStorageAddress = (name: string, keys: string[]) => {
     // storage_var address is the sn_keccak of the name hashed with the pedersen hash of the keys
     // console.log(name, keys)
-    let res:any = starknetKeccak(name)
+    let res: any = starknetKeccak(name)
     keys.forEach((key) => {
-      if(key==='') return;
-      try{
-      let felt_key = toFelt(key);
-      res = pedersen([res, felt_key]);
-    } catch(e) {
-      toast({
-        title: "Invalid BN Character!!",
-        description: `"${key}" Not a valid key character`,
-        isClosable: true,
-        duration: 3000,
-        status: "error"
-      });
-      setStorageVarFormState({...storageVarFormState, args: ""});
-    }
+      if (key === '') return;
+      try {
+        let felt_key = toFelt(key);
+        res = pedersen([res, felt_key]);
+      } catch (e) {
+        toast({
+          title: "Invalid BN Character!!",
+          description: `"${key}" Not a valid key character`,
+          isClosable: true,
+          duration: 3000,
+          status: "error"
+        });
+        setStorageVarFormState({ ...storageVarFormState, args: "" });
+      }
     });
     return toHex(res);
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    switch(e.target.name) {
-      case "storage-name": setStorageVarFormState({...storageVarFormState, name: e.target.value}); break;
-      case "storage-args": setStorageVarFormState({...storageVarFormState, args: e.target.value}); break;
+    switch (e.target.name) {
+      case "storage-name": setStorageVarFormState({ ...storageVarFormState, name: e.target.value }); break;
+      case "storage-args": setStorageVarFormState({ ...storageVarFormState, args: e.target.value }); break;
     }
   }
 
@@ -76,8 +76,8 @@ const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
           fontSize={"sm"}
           placeholder={"Leave empty if not required"}
           padding={"8px"}
-          type="text" 
-          id={"storage-name"} 
+          type="text"
+          id={"storage-name"}
           name={"storage-name"}
           onChange={handleChange}
           value={storageVarFormState.name}
@@ -96,7 +96,7 @@ const StorageVarForm:React.FC<Props> = ({setStorageAddress}) => {
         <Input
           variant={"outline"}
           padding={"8px"}
-          type="text" 
+          type="text"
           name={"storage-args"}
           id={"storage-args"}
           placeholder={"Enter `,` seperated args"}
