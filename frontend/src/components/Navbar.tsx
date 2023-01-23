@@ -42,14 +42,14 @@ const Navbar = () => {
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} width={"100%"}>
         <Flex justifyContent={"center"} width={"100%"}>
-            <Flex h={16} alignItems={'center'} justifyContent={'space-between'} width={"100%"} maxWidth={"5xl"}>
+            <Flex h={"auto"} p={"10px"} direction={{base: 'column', md: 'row'}} alignItems={'center'} justifyContent={'space-between'} width={"100%"} maxWidth={"5xl"}>
                 <Flex alignItems={"center"} >
                     <Image src={"/logo.svg"} maxHeight={"30px"} />
                     <Heading variant={"h3"} fontSize={"xl"}>ENS Resolution</Heading>
                 </Flex>
 
                 <Flex alignItems={'center'}>
-                    <Stack direction={'row'} spacing={3}>
+                    <Stack direction={{base: 'column', md: 'row'}} spacing={3}>
                         
                         <ConnectWallet />
                         <Button onClick={toggleColorMode}>

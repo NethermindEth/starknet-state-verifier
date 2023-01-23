@@ -1,14 +1,30 @@
-import { Box, Button, Card, Collapse, Divider, Flex, FormLabel, Heading, HStack, Input, Tooltip, useToast, VStack } from "@chakra-ui/react";
+
+import {
+  Box,
+  Button,
+  Card,
+  Collapse,
+  Divider,
+  Flex,
+  FormLabel,
+  Heading,
+  HStack,
+  Input,
+  Tooltip,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
 import React, { Key, useEffect, useState } from "react";
 import { pedersen, starknetKeccak } from "starknet/utils/hash";
 import { toFelt, toHex } from "starknet/utils/number";
 
 
 interface Props {
-  setStorageAddress: (address: string) => void
+  setStorageAddress: (address: string) => void;
 }
 
 const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
+
 
   const toast = useToast();
 
@@ -20,17 +36,18 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
   useEffect(() => {
     const address = computeStorageAddress(
       storageVarFormState.name,
-      storageVarFormState?.args?.split(',')
+      storageVarFormState?.args?.split(",")
+
     );
     setStorageAddress(address);
-  }, [storageVarFormState])
+  }, [storageVarFormState]);
 
   const computeStorageAddress = (name: string, keys: string[]) => {
     // storage_var address is the sn_keccak of the name hashed with the pedersen hash of the keys
     // console.log(name, keys)
-    let res: any = starknetKeccak(name)
+    let res: any = starknetKeccak(name);
     keys.forEach((key) => {
-      if (key === '') return;
+      if (key === "") return;
       try {
         let felt_key = toFelt(key);
         res = pedersen([res, felt_key]);
@@ -40,34 +57,45 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
           description: `"${key}" Not a valid key character`,
           isClosable: true,
           duration: 3000,
-          status: "error"
+          status: "error",
         });
         setStorageVarFormState({ ...storageVarFormState, args: "" });
       }
     });
     return toHex(res);
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
-      case "storage-name": setStorageVarFormState({ ...storageVarFormState, name: e.target.value }); break;
-      case "storage-args": setStorageVarFormState({ ...storageVarFormState, args: e.target.value }); break;
+      case "storage-name":
+        setStorageVarFormState({
+          ...storageVarFormState,
+          name: e.target.value,
+        });
+        break;
+      case "storage-args":
+        setStorageVarFormState({
+          ...storageVarFormState,
+          args: e.target.value,
+        });
+        break;
     }
-  }
+  };
 
   return (
     <Flex
+      direction={{ base: "column", md: "row" }}
       justifyContent={"space-between"}
       width={"100%"}
       py={"10px"}
     >
-      <Box width={"40%"}>
-        <FormLabel
-          htmlFor={"storage-name"}
-          fontWeight={"400"}
-          fontSize={"sm"}
-        >
-          <Tooltip label={"It is the storage variable name which is defined in the source cairo contract."}>
+      <Box width={{ base: "100%", md: "40%" }}>
+        <FormLabel htmlFor={"storage-name"} fontWeight={"400"} fontSize={"sm"}>
+          <Tooltip
+            label={
+              "It is the storage variable name which is defined in the source cairo contract."
+            }
+          >
             Storage variable name
           </Tooltip>
         </FormLabel>
@@ -83,13 +111,13 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
           value={storageVarFormState.name}
         />
       </Box>
-      <Box width={"40%"}>
-        <FormLabel
-          htmlFor={"storage-name"}
-          fontWeight={"400"}
-          fontSize={"sm"}
-        >
-          <Tooltip label={"Enter your storage variable arguments here comma seperated. e.g two args as: 0x034, 0x343"}>
+      <Box width={{ base: "100%", md: "40%" }}>
+        <FormLabel htmlFor={"storage-name"} fontWeight={"400"} fontSize={"sm"}>
+          <Tooltip
+            label={
+              "Enter your storage variable arguments here comma seperated. e.g two args as: 0x034, 0x343"
+            }
+          >
             Storage variable arguments
           </Tooltip>
         </FormLabel>
@@ -106,6 +134,6 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
       </Box>
     </Flex>
   );
-}
+};
 
 export default StorageVarForm;

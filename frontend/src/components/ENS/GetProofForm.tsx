@@ -72,6 +72,7 @@ const GetProofForm: React.FC<Props> = ({
     });
 
   const provider = useProvider();
+  // const provider = ethers.providers.getDefaultProvider("goerli");
 
   const getLatestEthereumBlockNumber = async (): Promise<number> => {
     return await provider.getBlockNumber();
@@ -81,6 +82,7 @@ const GetProofForm: React.FC<Props> = ({
     return new ethers.Contract(
       starknetCoreContractAddress,
       StarknetCoreContract.abi,
+      // Changed to default ethers provider since not using any signature or transaction (Change to wallet one if transaction required.)
       provider
     );
   };
@@ -148,6 +150,7 @@ const GetProofForm: React.FC<Props> = ({
     return () => clearInterval(id);
   }, [coreContractRootState]);
 
+  
   const { connector: activeConnector, isConnected } = useAccount();
 
   const { connect, connectors, error, pendingConnector } = useConnect({
@@ -156,9 +159,10 @@ const GetProofForm: React.FC<Props> = ({
 
   // Handle the form submission
   const handleSubmit = async () => {
-    if (!isConnected) {
-      connect();
-    }
+    // Not necessary to connect.
+    // if (!isConnected) {
+    //   connect();
+    // }
 
     // const formData = new FormData(event.currentTarget);
     const contractAddress = state.contractAddress;
@@ -212,13 +216,17 @@ const GetProofForm: React.FC<Props> = ({
 
   return (
     <Flex flexDir={"column"} justifyContent={"flex-start"} width={"100%"}>
-      <Flex my={"10px"} alignItems={"center"}>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        my={"10px"}
+        alignItems={{ base: "flex-start", md: "center" }}
+      >
         <FormLabel
           htmlFor={"contract-address"}
           fontSize={"sm"}
           fontWeight={"bold"}
           margin={"0px"}
-          w={"20%"}
+          w={{ base: "100%", md: "20%" }}
         >
           <Tooltip
             label={
@@ -229,7 +237,7 @@ const GetProofForm: React.FC<Props> = ({
           </Tooltip>
         </FormLabel>
         <Input
-          w={"80%"}
+          w={{ base: "100%", md: "80%" }}
           fontSize={"sm"}
           type="text"
           id={"contract-address"}
@@ -240,13 +248,17 @@ const GetProofForm: React.FC<Props> = ({
           value={state?.contractAddress}
         />
       </Flex>
-      <Flex my={"10px"} alignItems={"center"}>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        my={"10px"}
+        alignItems={{ base: "flex-start", md: "center" }}
+      >
         <FormLabel
           htmlFor={"storagevar-address"}
           fontSize={"sm"}
           fontWeight={"bold"}
           margin={"0px"}
-          w={"20%"}
+          w={{ base: "100%", md: "20%" }}
         >
           <Tooltip label={"This is calculated from above storage inputs"}>
             Storage variable address
@@ -256,7 +268,7 @@ const GetProofForm: React.FC<Props> = ({
           padding={"8px"}
           border={"1px solid #ccc"}
           borderRadius={"4px"}
-          w={"80%"}
+          w={{ base: "100%", md: "80%" }}
           fontSize={"sm"}
           value={state?.storageAddress}
           readOnly
@@ -265,13 +277,17 @@ const GetProofForm: React.FC<Props> = ({
           name={"storagevar-address"}
         />
       </Flex>
-      <Flex my={"10px"} alignItems={"center"}>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        my={"10px"}
+        alignItems={{ base: "flex-start", md: "center" }}
+      >
         <FormLabel
           htmlFor={"block-tag"}
           fontSize={"sm"}
           fontWeight={"bold"}
           margin={"0px"}
-          w={"20%"}
+          w={{ base: "100%", md: "20%" }}
         >
           <Tooltip
             label={
@@ -286,7 +302,7 @@ const GetProofForm: React.FC<Props> = ({
           onChange={(e) => {
             setStarknetCoreContractAddress(e.target.value);
           }}
-          w={"80%"}
+          w={{ base: "100%", md: "80%" }}
           fontSize={"sm"}
           type="text"
           id={"corecontract-address"}
@@ -334,7 +350,12 @@ const GetProofForm: React.FC<Props> = ({
             </Text>
           </Tooltip>
         </Box>
-        <Box ml={"10px"} border={`1px dashed`} p={"10px"}>
+        <Box
+          ml={{ base: "0px", md: "10px" }}
+          mb={{ base: "10px" }}
+          border={`1px dashed`}
+          p={"10px"}
+        >
           {pathFinderSyncState.current_block_num.gt(
             coreContractRootState.stateBlockNumber
           ) ? (
@@ -348,7 +369,7 @@ const GetProofForm: React.FC<Props> = ({
                 justifyContent={"center"}
               >
                 <CheckCircleIcon fontSize={40} color={stateRootColor} />
-                <Text> synced</Text>
+                <Text>synced</Text>
               </Box>
             </Tooltip>
           ) : (
@@ -363,7 +384,7 @@ const GetProofForm: React.FC<Props> = ({
                 justifyContent={"center"}
               >
                 <CheckCircleIcon fontSize={40} color={"red"} />
-                <Text> unsynced</Text>
+                <Text>unsynced</Text>
               </Box>
             </Tooltip>
           )}
