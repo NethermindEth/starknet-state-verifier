@@ -67,10 +67,12 @@ const EnsProofCard = () => {
   const [
     proofCardState, setProofCardState
   ] = useState<EnsProofCardState>({
-    contractAddress: "",
+    // Hacky way of showing a default
+    contractAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
     ethereumBlockNumber: "",
     starknetCommitmentBlockNumber: "",
-    storageAddress: ""
+    // Hacky way of showing a default
+    storageAddress: "0x274825ad8624f0d1af1da415199b97e8ed1f74f6c947457a207d6bb7a966d5f"
   });
 
   const mutateSetProofCardState = (key: EnsProofCardStateKeys, value: string) => {
