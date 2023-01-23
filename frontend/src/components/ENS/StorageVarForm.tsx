@@ -1,3 +1,4 @@
+
 import {
   Box,
   Button,
@@ -17,22 +18,26 @@ import React, { Key, useEffect, useState } from "react";
 import { pedersen, starknetKeccak } from "starknet/utils/hash";
 import { toFelt, toHex } from "starknet/utils/number";
 
+
 interface Props {
   setStorageAddress: (address: string) => void;
 }
 
 const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
+
+
   const toast = useToast();
 
   const [storageVarFormState, setStorageVarFormState] = useState({
-    name: "",
-    args: "",
+    name: "ERC20_balances", // some defaults for this contract -> 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
+    args: "0x01C62c52C1709aCB3EB9195594E39C04323658463Cfe0c641e39b99a83ba11a1"
   });
 
   useEffect(() => {
     const address = computeStorageAddress(
       storageVarFormState.name,
       storageVarFormState?.args?.split(",")
+
     );
     setStorageAddress(address);
   }, [storageVarFormState]);
