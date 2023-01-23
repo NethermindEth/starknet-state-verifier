@@ -1,32 +1,36 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
-import { ChakraProvider } from '@chakra-ui/react'
-import { Chain, WagmiConfig, createClient, configureChains, mainnet, goerli } from 'wagmi'
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { ChakraProvider } from "@chakra-ui/react";
+import {
+  Chain,
+  WagmiConfig,
+  createClient,
+  configureChains,
+  mainnet,
+  goerli,
+} from "wagmi";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 // import * as dotenv from 'dotenv'
 // dotenv.config();
 const localChain: Chain = {
   id: 1337,
-  name: 'local',
-  network: 'localhost',
+  name: "local",
+  network: "localhost",
   rpcUrls: {
-    default: { http: ['http://localhost:8545'] },
+    default: { http: ["http://localhost:8545"] },
   },
   nativeCurrency: {
-    name: 'Ether',
-    symbol: 'ETH',
+    name: "Ether",
+    symbol: "ETH",
     decimals: 18,
   },
-}
-
-
-
+};
 
 // const { chains, provider } = configureChains(
 //   [localChain],
@@ -48,10 +52,9 @@ const localChain: Chain = {
 // )
 
 const { chains, provider } = configureChains(
-  [mainnet, goerli, localChain],
+  [goerli],
   [
-    alchemyProvider({ apiKey: 'ozZ0QV1qPAcGx_irBynNiiLkddGb689w' }),
-    publicProvider(),
+    alchemyProvider({ apiKey: "ozZ0QV1qPAcGx_irBynNiiLkddGb689w" }),
     // jsonRpcProvider({
     //   rpc: (chain) => {
     //     if (chain.id === 1337) {
@@ -69,8 +72,8 @@ const { chains, provider } = configureChains(
     // },
     // ),
   ],
-  { stallTimeout: 5000 },
-)
+  { stallTimeout: 5000 }
+);
 
 const client = createClient({
   autoConnect: true,
@@ -79,20 +82,20 @@ const client = createClient({
     new InjectedConnector({
       chains,
       options: {
-        name: 'Injected',
+        name: "Injected",
         shimDisconnect: true,
       },
-    })],
+    }),
+  ],
   provider,
-})
+});
 
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ChakraProvider>
       <WagmiConfig client={client}>
         <App />
       </WagmiConfig>
     </ChakraProvider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

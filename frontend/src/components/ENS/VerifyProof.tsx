@@ -109,10 +109,11 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
       if (data) {
         toast({
           title: "Fetched Successfully.",
-          description: "Successfully retrieved state from the verifier contract.",
+          description:
+            "Successfully retrieved state from the verifier contract.",
           status: "success",
           isClosable: true,
-          duration: 3000
+          duration: 3000,
         });
         setVerificationResult({ type: "success", message: data.toString() });
       } else {
@@ -122,7 +123,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
           description: "Failed to fetch state from the Verifier contract.",
           status: "error",
           isClosable: true,
-          duration: 3000
+          duration: 3000,
         });
         setVerificationResult({
           type: "error",
@@ -231,7 +232,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
         description: "Failed to Refetch state from the Verifier contract.",
         status: "error",
         isClosable: true,
-        duration: 3000
+        duration: 3000,
       });
       setIsLoading(false);
     }
@@ -248,13 +249,17 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
         Verification
       </Heading>
       <Box my={"20px"}>
-        <Flex w={"100%"} alignItems={"center"}>
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          w={"100%"}
+          alignItems={{ base: "flex-start", md: "center" }}
+        >
           <FormLabel
             htmlFor={"verifier"}
             fontSize={"sm"}
             fontWeight={"bold"}
             margin={"0px"}
-            w={"20%"}
+            w={{ base: "100%", md: "20%" }}
           >
             <Tooltip
               label={
@@ -265,7 +270,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
             </Tooltip>
           </FormLabel>
           <Input
-            w={"80%"}
+            w={{ base: "100%", md: "80%" }}
             fontSize={"sm"}
             type="text"
             id={"verifier"}
@@ -277,7 +282,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
           />
           <Button
             my={"10px"}
-            ml={"10px"}
+            ml={{ base: "0px", md: "10px" }}
             fontWeight={"600"}
             cursor={"pointer"}
             colorScheme={"blue"}
@@ -302,7 +307,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
             type="text" id={"state-root"} name={"state-root"} />
         </HStack> */}
       </Box>
-      <Box  w={"100%"}>
+      <Box w={"100%"}>
         <Heading as={"h5"} variant={"h5"} fontSize={"2xl"} textAlign={"center"}>
           Verified Storage Value
         </Heading>
