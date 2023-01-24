@@ -11,6 +11,7 @@ import {
   HStack,
   Input,
   Link,
+  Select,
   Text,
   Tooltip,
   useToast,
@@ -20,6 +21,7 @@ import { Spinner } from "@chakra-ui/react";
 
 import { EnsProofCardState } from "./EnsProofCard";
 import { L1_EXPLORER_BASE_URL, L2_EXPLORER_BASE_URL } from "../../constants";
+import { ArrowDownIcon } from "@chakra-ui/icons";
 
 interface Props {
   state: EnsProofCardState;
@@ -74,6 +76,11 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
   const [verifierAddress, setVerifierAddress] =
     useState<string>(VERIFIER_ADDRESS);
 
+  const availableVeriferAddresses = [
+    VERIFIER_ADDRESS,
+    "0x04599D9552f1d6b4e4e9df4cEB453BAd60AdeDBF",
+  ];
+
   // const [starknetStateRoot, setStarknetStateRoot] = useState('');
   const [storageProof, setStorageProof] = useState([]);
   const [contractProof, setContractProof] = useState([]);
@@ -97,7 +104,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
       storageProof[0],
     ],
     overrides: { blockTag: parseInt(ethereumBlockNumber!) },
-    enabled: false,
+    enabled: !!proof?.contract_data && !!contractData,
     onError: (error: Error) => {
       console.log(error);
       setVerificationResult({
@@ -120,7 +127,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
         console.log(error);
         toast({
           title: "Failed to fetch state!!",
-          description: "Failed to fetch state from the Verifier contract.",
+          description: "Failed to verify state from the Verifier contract.",
           status: "error",
           isClosable: true,
           duration: 3000,
@@ -170,7 +177,8 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     /// parse proof JSON
-    if (!proof) return;
+    console.log(!proof?.contract_data);
+    if (!proof?.contract_data) return;
 
     let myContractProofs: any = [];
     let myStorageproofs: any = [];
@@ -194,9 +202,18 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
 
   // recompute contract data used with the contractRead hook
   useEffect(() => {
-    if (!proof) {
+    if (!proof?.contract_data) {
+      toast({
+        title: "Contract doesn't Exists!!",
+        description:
+          "Failed to fetch contract data from L2. Make sure your contract exists on starknet L2.",
+        status: "error",
+        isClosable: true,
+        duration: 3000,
+      });
       return;
     }
+
     const _contractData: MyContractData = {
       contractStateRoot: proof.contract_data?.root || "0x0",
       contractAddress: contractAddress!,
@@ -216,26 +233,20 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
   }, [contractData, contractProof, storageProof, verifierAddress]);
 
   const fetchResult = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       console.log("block number", ethereumBlockNumber);
-      await readContractVerifier.refetch({
-        throwOnError: true,
-        cancelRefetch: false,
-      });
-      console.log("verifying proof...");
-      setIsLoading(false);
+      if (!!contractData) {
+        await readContractVerifier.refetch({
+          throwOnError: true,
+          cancelRefetch: false,
+        });
+        console.log("verifying proof...");
+      }
     } catch (error) {
       console.log(error);
-      toast({
-        title: "Failed to Refetch",
-        description: "Failed to Refetch state from the Verifier contract.",
-        status: "error",
-        isClosable: true,
-        duration: 3000,
-      });
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const handleSubmit = () => {
@@ -252,7 +263,8 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
         <Flex
           direction={{ base: "column", md: "row" }}
           w={"100%"}
-          alignItems={{ base: "flex-start", md: "center" }}
+          alignItems={{ base: "flex-start", md: "flex-start" }}
+          justifyContent={"space-around"}
         >
           <FormLabel
             htmlFor={"verifier"}
@@ -260,6 +272,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
             fontWeight={"bold"}
             margin={"0px"}
             w={{ base: "100%", md: "20%" }}
+            mt={"10px"}
           >
             <Tooltip
               label={
@@ -269,17 +282,37 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
               Verifier's Address
             </Tooltip>
           </FormLabel>
-          <Input
-            w={{ base: "100%", md: "80%" }}
-            fontSize={"sm"}
-            type="text"
-            id={"verifier"}
-            name={"verifier"}
-            value={verifierAddress}
-            onChange={(e) => {
-              setVerifierAddress(e.target.value);
-            }}
-          />
+          <Box>
+            <Select
+              variant="outline"
+              placeholder="Available Verifier Contract"
+              icon={<ArrowDownIcon />}
+              onChange={(e) => {
+                setVerifierAddress(e.target.value);
+              }}
+              my={"5px"}
+            >
+              {availableVeriferAddresses.map((address: string) => {
+                return (
+                  <option key={address} value={address}>
+                    {address}
+                  </option>
+                );
+              })}
+            </Select>
+            <Input
+              w={{ base: "100%", md: "100%" }}
+              fontSize={"sm"}
+              type="text"
+              id={"verifier"}
+              name={"verifier"}
+              value={verifierAddress}
+              placeholder={"Input verifier address on L1 or select"}
+              onChange={(e) => {
+                setVerifierAddress(e.target.value);
+              }}
+            />
+          </Box>
           <Button
             my={"10px"}
             ml={{ base: "0px", md: "10px" }}

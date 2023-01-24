@@ -199,7 +199,7 @@ const GetProofForm: React.FC<Props> = ({
     // Call the JSON-RPC method with the given params
     // and pass the result to the onResult callback
     const result = await jsonRpcCall("pathfinder_getProof", args);
-    console.log(result);
+    console.log({result});
 
     setState({
       ...state,
