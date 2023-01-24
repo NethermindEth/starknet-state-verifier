@@ -158,6 +158,17 @@ contract StarknetVerifier is
         console.log("stateRoot", starknetCoreContract.stateRoot());
         int256 coreStateBlockNumber = starknetCoreContract.stateBlockNumber();
 
+        // proof array must have atleast one element
+        require(
+            contractProofArray.length > 0,
+            "contract proofs must have atleast one element!"
+        );
+
+        require(
+            storageProofArray.length > 0,
+            "storage proofs must have atleast one element!"
+        );
+
         // This is a safe assumption.
         require(
             coreStateBlockNumber > 0,
@@ -221,6 +232,11 @@ contract StarknetVerifier is
     ) public view returns (uint256 value) {
         uint256 expectedHash = rootHash;
         int256 pathBitIndex = 250; // start from the MSB bit index
+
+        require(
+            proofArray.length > 0,
+            "proof array must have atleast one element."
+        );
 
         bool isRight = true;
         for (uint256 i = 0; i < proofArray.length; i++) {
