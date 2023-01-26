@@ -120,7 +120,6 @@ server.add(IStarknetResolver.abi, [
     func: async ([node]: any, { to, data: _callData }) => {
       // const addrSlot = ethers.utils.keccak256(node + '00'.repeat(31) + '01');
       let myCompositeStateProof: MyStarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
-      let tempCompositeStateProof: MyStarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
       const abiInterface = toInterface(IStarknetResolver.abi);
       const fn = abiInterface.getFunction('addr(bytes32)');
       console.log('fn', fn)
