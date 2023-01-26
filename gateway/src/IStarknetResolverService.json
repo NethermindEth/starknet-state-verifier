@@ -1,0 +1,176 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IStarknetResolverService",
+  "sourceName": "contracts/StarknetVerifier.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "node",
+          "type": "bytes32"
+        }
+      ],
+      "name": "addr",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "int256",
+              "name": "blockNumber",
+              "type": "int256"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "contractStateRoot",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "contractAddress",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "storageVarAddress",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "classHash",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "hashVersion",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "nonce",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct ContractData",
+              "name": "contractData",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "enum NodeType",
+                  "name": "nodeType",
+                  "type": "uint8"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "leftHash",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "rightHash",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct BinaryProof",
+                  "name": "binaryProof",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "childHash",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "path",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "length",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct EdgeProof",
+                  "name": "edgeProof",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct StarknetProof[]",
+              "name": "contractProofArray",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "enum NodeType",
+                  "name": "nodeType",
+                  "type": "uint8"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "leftHash",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "rightHash",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct BinaryProof",
+                  "name": "binaryProof",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "childHash",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "path",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "length",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct EdgeProof",
+                  "name": "edgeProof",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct StarknetProof[]",
+              "name": "storageProofArray",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct StarknetCompositeStateProof",
+          "name": "proof",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

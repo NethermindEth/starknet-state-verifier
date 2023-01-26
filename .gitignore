@@ -20,3 +20,10 @@ pathfinder/
 
 #python test file
 test/testpy.py
+
+#gateway
+gateway/dist
+
+
+#testclient
+testclient/dist

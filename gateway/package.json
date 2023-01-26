@@ -32,7 +32,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@ensdomains/op-resolver-gateway",
+  "name": "@ensdomains/sn-resolver-gateway",
   "author": "Makoto Inoue",
   "module": "dist/gateway.esm.js",
   "size-limit": [

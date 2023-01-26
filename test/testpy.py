@@ -12,7 +12,7 @@ from starkware.cairo.lang.vm.crypto import pedersen_hash
 from starkware.starknet.public.abi import get_selector_from_name, get_storage_var_address, starknet_keccak
 
 
-print("initializer ", get_storage_var_address('_initializer'))
+print("initializer ", get_storage_var_address('resolver'))
 # print("pedersen_hash ", hex(pedersen_hash(
 #     0x1e240, 0x206f38f7e4f15e87567361213c28f235cccdaa1d7fd34c9db1dfe9489c6a091) + 251))
 

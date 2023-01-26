@@ -3,11 +3,50 @@ import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
 
-interface IResolverService {
+enum NodeType {
+    BINARY,
+    EDGE
+}
+
+struct ContractData {
+    uint256 contractStateRoot;
+    uint256 contractAddress;
+    uint256 storageVarAddress;
+    uint256 classHash;
+    uint256 hashVersion;
+    uint256 nonce;
+}
+
+struct BinaryProof {
+    uint256 leftHash;
+    uint256 rightHash;
+}
+
+struct EdgeProof {
+    uint256 childHash;
+    uint256 path;
+    uint256 length;
+}
+
+struct StarknetProof {
+    NodeType nodeType;
+    BinaryProof binaryProof;
+    EdgeProof edgeProof;
+}
+
+// includes contract proof and state/storage proof for a partciular starknet block
+struct StarknetCompositeStateProof {
+    int256 blockNumber;
+    ContractData contractData;
+    StarknetProof[] contractProofArray;
+    StarknetProof[] storageProofArray;
+}
+
+interface IStarknetResolverService {
     function addr(bytes32 node)
         external
         view
-        returns (L2StateProof memory proof);
+        returns (StarknetCompositeStateProof memory proof);
 }
 
 // Starknet Core Contract Minimal Interface
@@ -27,7 +66,7 @@ interface StarknetCoreContract {
 // Starknet Proof Verifier. This contract verifies a Starknet proof for a contract and a storage address/value
 contract StarknetVerifier {
     string[] public gateways;
-    address public l2resolver;
+    uint256 public l2resolver;
 
     error OffchainLookup(
         address sender,
@@ -40,40 +79,10 @@ contract StarknetVerifier {
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
 
-    enum NodeType {
-        BINARY,
-        EDGE
-    }
-
-    struct ContractData {
-        uint256 contractStateRoot;
-        uint256 contractAddress;
-        uint256 storageVarAddress;
-        uint256 classHash;
-        uint256 hashVersion;
-        uint256 nonce;
-    }
-    struct BinaryProof {
-        uint256 leftHash;
-        uint256 rightHash;
-    }
-
-    struct EdgeProof {
-        uint256 childHash;
-        uint256 path;
-        uint256 length;
-    }
-
-    struct StarknetProof {
-        NodeType nodeType;
-        BinaryProof binaryProof;
-        EdgeProof edgeProof;
-    }
-
     PedersenHash pedersen;
     StarknetCoreContract starknetCoreContract;
 
-    // uint256 MASK_250 = (2**250) - 1; // to simulate sn_keccak
+    uint256 MASK_250 = (2**250) - 1; // to simulate sn_keccak
     uint256 storageVarName =
         0x29539a1d23af1810c48a07fe7fc66a3b34fbc8b37e9b3cdb97bb88ceab7e4bf; // sn_keccak of 'resolver' in https://github.com/starknet-id/ens_resolver/blob/3577d3bf3e309614dbec16aca56b7cade2bac949/src/main.cairo#L7
 
@@ -81,7 +90,7 @@ contract StarknetVerifier {
         address pedersenAddress,
         address _starknetCoreContractAddress,
         string[] memory _gateways,
-        address _l2resolver
+        uint256 _l2resolver
     ) public {
         pedersen = PedersenHash(pedersenAddress);
         starknetCoreContract = StarknetCoreContract(
@@ -92,22 +101,25 @@ contract StarknetVerifier {
     }
 
     /************************************ENS STUFF */
-    function getl2Resolver() external view returns (address) {
+
+    function getl2Resolver() external view returns (uint256) {
         return l2resolver;
     }
 
     // returns the address of the storage within the starknet contract
     function calculateDomainStorageVarAddressFor(uint256 domain)
-        external
+        internal
         view
         returns (uint256)
     {
         return hash(storageVarName, domain);
     }
 
-    function addr(bytes32 node) public view returns (address) {
-        return _addr(node, StarknetVerifier.addrWithProof.selector);
-    }
+    // function addr(bytes32 node) public view returns (address) {
+    //     // the namehash always hash to be MASKED against 250 bits to simulate sn_keccak
+    //     uint256 starknetNode = uint256(node) & MASK_250;
+    //     return _addr(starknetNode, StarknetVerifier.addrWithProof.selector);
+    // }
 
     function addr(bytes32 node, uint256 coinType)
         public
@@ -117,71 +129,97 @@ contract StarknetVerifier {
         if (coinType == 9004) {
             // TODO: not sure this should be 60 for ETH or 9004 for starknet
             return
-                addressToBytes(
+                uint256ToBytes(
                     _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
                 );
         } else {
-            return addressToBytes(address(0));
+            return uint256ToBytes(0);
         }
     }
 
     function _addr(bytes32 node, bytes4 selector)
         private
         view
-        returns (address)
+        returns (uint256)
     {
         // uint256 storageVarAddress = calculateDomainStorageVarAddressFor(
         //     uint256(node)
         // );
+        uint256 starknetNode = uint256(node) & MASK_250;
+
         bytes memory callData = abi.encodeWithSelector(
-            IResolverService.addr.selector,
-            node
+            IStarknetResolverService.addr.selector,
+            starknetNode
         );
         revert OffchainLookup(
             address(this),
             gateways,
             callData,
             selector,
-            abi.encode(node)
+            abi.encode(starknetNode)
         );
     }
 
-    function addrWithProof(bytes calldata response, bytes calldata extraData)
-        external
-        view
-        returns (address)
-    {
-        return _addrWithProof(response, extraData);
-    }
+    // function addrWithProof(bytes calldata response, bytes calldata extraData)
+    //     external
+    //     view
+    //     returns (address)
+    // {
+    //     return _addrWithProof(response, extraData);
+    // }
 
     function bytesAddrWithProof(
         bytes calldata response,
         bytes calldata extraData
     ) external view returns (bytes memory) {
-        return addressToBytes(_addrWithProof(response, extraData));
+        return uint256ToBytes(_addrWithProof(response, extraData));
     }
 
     function _addrWithProof(bytes calldata response, bytes calldata extraData)
         internal
         view
-        returns (address)
+        returns (uint256)
     {
-        // L2StateProof memory proof = abi.decode(response, (L2StateProof));
-        // bytes32 node = abi.decode(extraData, (bytes32));
-        // require(verifyStateRootProof(proof), "Invalid state root");
-        // bytes32 slot = keccak256(abi.encodePacked(node, uint256(1)));
-        // bytes32 value = getStorageValue(l2resolver, slot, proof);
-        // return address(uint160(uint256(value)));
-        console.log("_addrWithProof");
-        return address(uint160(uint256(-1)));
+        StarknetCompositeStateProof memory proof = abi.decode(
+            response,
+            (StarknetCompositeStateProof)
+        );
+        bytes32 node = abi.decode(extraData, (bytes32));
+        uint256 storageVarAdress = calculateDomainStorageVarAddressFor(
+            uint256(node)
+        );
+
+        // update the storageVarAddress with the one we calculate here to make sure gateway has not returned a random storage var address/proof
+        proof.contractData.contractAddress = l2resolver;
+        proof.contractData.storageVarAddress = storageVarAdress;
+        uint256 starknetAddress = this.verifiedStorageValue(
+            proof.blockNumber,
+            proof.contractData,
+            proof.contractProofArray,
+            proof.storageProofArray
+        );
+
+        // // require(verifyStateRootProof(proof), "Invalid state root");
+        // // bytes32 slot = keccak256(abi.encodePacked(node, uint256(1)));
+        // // bytes32 value = getStorageValue(l2resolver, slot, proof);
+        // // return address(uint160(uint256(value)));
+        // console.log("_addrWithProof");
+        return starknetAddress;
     }
 
-    function addressToBytes(address a) internal pure returns (bytes memory b) {
-        b = new bytes(20);
+    function uint256ToBytes(uint256 x) private pure returns (bytes memory b) {
+        b = new bytes(32);
         assembly {
-            mstore(add(b, 32), mul(a, exp(256, 12)))
+            mstore(add(b, 32), x)
         }
     }
+
+    // function uint256ToBytes(uint256 a) internal pure returns (bytes memory b) {
+    //     b = new bytes(32);
+    //     assembly {
+    //         mstore(add(b, 32), mul(a, exp(256, 12)))
+    //     }
+    // }
 
     /************************************END OF ENS STUFF */
 
