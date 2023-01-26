@@ -9,7 +9,8 @@ import "solidity-coverage";
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
 import fs from 'fs';
-
+// hardhat.config.ts
+import '@openzeppelin/hardhat-upgrades';
 
 dotenv.config();
 

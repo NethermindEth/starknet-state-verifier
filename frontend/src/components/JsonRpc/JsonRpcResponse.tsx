@@ -11,18 +11,29 @@ const EditableControls = () => {
     getCancelButtonProps,
     getEditButtonProps,
   } = useEditableControls();
-  return isEditing ? (
-    <Flex justifyContent="center" mt="2">
-      <ButtonGroup size='sm'>
-        <IconButton aria-label='Save' icon={<CheckIcon />} {...getSubmitButtonProps()} />
-        <IconButton aria-label='Cancel' icon={<CloseIcon />} {...getCancelButtonProps()} />
-      </ButtonGroup>
-    </Flex>
-  ) : (
-    <Flex justifyContent='center'>
-      <IconButton size='sm' aria-label="edit" icon={<EditIcon />} {...getEditButtonProps()} />
-    </Flex>
-  )
+  const editableViewBg = useColorModeValue("gray.100", "gray.900");
+  return <Box 
+    w={"100%"} 
+    position={"sticky"} 
+    bottom={"0px"}
+    py={"2px"}
+    background={editableViewBg}
+  >
+    {
+      isEditing ? (
+        <Flex justifyContent="center">
+          <ButtonGroup size='sm'>
+            <IconButton aria-label='Save' icon={<CheckIcon />} {...getSubmitButtonProps()} />
+            <IconButton aria-label='Cancel' icon={<CloseIcon />} {...getCancelButtonProps()} />
+          </ButtonGroup>
+        </Flex>
+      ) : (
+        <Flex justifyContent='center'>
+          <IconButton size='sm' aria-label="edit" icon={<EditIcon />} {...getEditButtonProps()} />
+        </Flex>
+      )
+    }
+  </Box>
 };
 
 interface Props {
@@ -42,18 +53,35 @@ const JsonRpcResponse = (props: Props) => {
     }
   }
 
+  const editableViewBg = useColorModeValue("gray.100", "gray.900");
+  const editableViewBgHover = useColorModeValue("gray.200", "gray.700");
+
   return (
     <Flex
       flexDir={"column"}
       alignItems={"center"}
       justifyContent={"center"}
       w={"100%"}
-      padding={"16px"}
+      py={"20px"}
     >
-      {props.data && <Editable maxHeight={"500px"} maxW={"800px"} overflowX={"scroll"} textAlign="left" whiteSpace={"pre"}
-        display={"block"} backgroundColor="gray.100" _hover={{ backgroundColor: "gray.200" }} defaultValue={json.stringify(props.data, null, 2)} onSubmit={onSubmitString} >
+      {props.data && 
+      <Editable 
+        maxHeight={"500px"} 
+        position={"relative"}
+        width={"100%"} 
+        maxW={"100%"} 
+        overflowX={"scroll"} 
+        textAlign="left" 
+        whiteSpace={"pre"}
+        display={"block"} 
+        transition={"all 0.3s ease"}
+        backgroundColor={editableViewBg} 
+        _hover={{ backgroundColor: editableViewBgHover }} 
+        defaultValue={json.stringify(props.data, null, 2)} 
+        onSubmit={onSubmitString} 
+      >
         <EditablePreview />
-        <EditableTextarea height="500px" width="800px" />
+        <EditableTextarea height="500px" width="100%" />
         <EditableControls />
       </Editable>}
     </Flex>

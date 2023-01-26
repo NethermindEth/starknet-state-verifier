@@ -1,7 +1,11 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.6.2 <0.9.0;
 import "./EllipticCurve.sol";
 import "./PedersenHash.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 enum NodeType {
     BINARY,
@@ -64,9 +68,17 @@ interface StarknetCoreContract {
 }
 
 // Starknet Proof Verifier. This contract verifies a Starknet proof for a contract and a storage address/value
-contract StarknetVerifier {
+contract StarknetVerifier is
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
+    uint256 private constant BIG_PRIME =
+        3618502788666131213697322783095070105623107215331596699973092056135872020481;
     string[] public gateways;
     uint256 public l2resolver;
+    PedersenHash public pedersen;
+    StarknetCoreContract public starknetCoreContract;
 
     error OffchainLookup(
         address sender,
@@ -76,28 +88,29 @@ contract StarknetVerifier {
         bytes extraData
     );
 
-    uint256 private constant BIG_PRIME =
-        3618502788666131213697322783095070105623107215331596699973092056135872020481;
-
-    PedersenHash pedersen;
-    StarknetCoreContract starknetCoreContract;
-
-    uint256 MASK_250 = (2**250) - 1; // to simulate sn_keccak
-    uint256 storageVarName =
+    uint256 constant MASK_250 = (2**250) - 1; // to simulate sn_keccak
+    uint256 constant storageVarName =
         0x29539a1d23af1810c48a07fe7fc66a3b34fbc8b37e9b3cdb97bb88ceab7e4bf; // sn_keccak of 'resolver' in https://github.com/starknet-id/ens_resolver/blob/3577d3bf3e309614dbec16aca56b7cade2bac949/src/main.cairo#L7
 
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
         address pedersenAddress,
         address _starknetCoreContractAddress,
         string[] memory _gateways,
         uint256 _l2resolver
-    ) public {
+    ) public initializer {
         pedersen = PedersenHash(pedersenAddress);
         starknetCoreContract = StarknetCoreContract(
             _starknetCoreContractAddress
         );
         gateways = _gateways;
         l2resolver = _l2resolver;
+        __Ownable_init();
+        __UUPSUpgradeable_init();
     }
 
     /************************************ENS STUFF */
@@ -221,7 +234,11 @@ contract StarknetVerifier {
     //     }
     // }
 
-    /************************************END OF ENS STUFF */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        override
+        onlyOwner
+    {}
 
     function hashForSingleProofNode(StarknetProof memory proof)
         public
@@ -251,21 +268,25 @@ contract StarknetVerifier {
         uint256 nonce,
         uint256 hashVersion
     ) public view returns (uint256) {
-        uint256 stateHash = hash(
+        uint256 _stateHash = hash(
             hash(hash(classHash, contractStateRoot), nonce),
             hashVersion
         );
-        return stateHash;
+        return _stateHash;
     }
 
     function hash(uint256 a, uint256 b) public view returns (uint256) {
         // TO DO: check if this is correct, the zero index access is not cool
-        return pedersen.hash(convertToBytes(a, b))[0];
+        uint256[] memory hashes = pedersen.hash(convertToBytes(a, b));
+
+        require(hashes.length > 0, "hashes returned length is less than zero!");
+
+        return hashes[0];
     }
 
     function convertToBytes(uint256 x, uint256 y)
         public
-        view
+        pure
         returns (bytes memory)
     {
         bytes memory b = new bytes(64);
@@ -293,17 +314,37 @@ contract StarknetVerifier {
         // and H(H(H(class_hash, contract_root), contract_nonce), RESERVED) should be the value(value in the leaf node) for the path in the contract proof.
         // Second part verifies the contract proof against the state root committed on L1 in the Starknet Core Contract
         console.log("stateRoot", starknetCoreContract.stateRoot());
+        int256 coreStateBlockNumber = starknetCoreContract.stateBlockNumber();
+
+        // proof array must have atleast one element
         require(
-            blockNumber == starknetCoreContract.stateBlockNumber(),
-            "Block number is invalid"
+            contractProofArray.length > 0,
+            "contract proofs must have atleast one element!"
         );
 
-        uint256 stateHash = stateHash(
+        require(
+            storageProofArray.length > 0,
+            "storage proofs must have atleast one element!"
+        );
+
+        // This is a safe assumption.
+        require(
+            coreStateBlockNumber > 0,
+            "failed to fetch starknet core contract state block!"
+        );
+
+        require(
+            blockNumber == coreStateBlockNumber,
+            "block number doesn't match with starknet core contract!"
+        );
+
+        uint256 _stateHash = stateHash(
             contractData.classHash,
             contractData.contractStateRoot,
             contractData.nonce,
             contractData.hashVersion
         );
+
         uint256 storageVarValue = verifyProof(
             contractData.contractStateRoot,
             contractData.storageVarAddress,
@@ -311,13 +352,23 @@ contract StarknetVerifier {
         );
 
         // the contract proof has to be verified against the state root committed on L1 in the Starknet Core Contract
+        uint256 stateRootCoreHash = starknetCoreContract.stateRoot();
+
+        require(
+            _stateHash != 0,
+            "stateroot hash is not fetched properly! revert"
+        );
+
         uint256 expectedStateHash = verifyProof(
-            starknetCoreContract.stateRoot(),
+            stateRootCoreHash,
             contractData.contractAddress,
             contractProofArray
         );
 
-        require(stateHash == expectedStateHash, "State hash is invalid");
+        require(
+            _stateHash == expectedStateHash,
+            "hashes don't match. invalid states!"
+        );
         return storageVarValue;
     }
 
@@ -340,16 +391,24 @@ contract StarknetVerifier {
         uint256 expectedHash = rootHash;
         int256 pathBitIndex = 250; // start from the MSB bit index
 
+        require(
+            proofArray.length > 0,
+            "proof array must have atleast one element."
+        );
+
         bool isRight = true;
         for (uint256 i = 0; i < proofArray.length; i++) {
             if (pathBitIndex >= 0) {
                 StarknetProof memory proof = proofArray[i];
                 if (expectedHash != hashForSingleProofNode(proof)) {
-                    revert("Proof is invalid");
+                    revert(
+                        "hash mismatch found!! invalid proof path reverting."
+                    );
                 }
                 if (proof.nodeType == NodeType.BINARY) {
                     isRight = ((path >> uint256(pathBitIndex)) & 1) == 1;
-                    // path = path & ~(1 << uint256(pathBitIndex)); // setting/clearing the bit as move through the path
+                    // path = path & ~(1 << uint256(pathBitIndex));
+                    // setting/clearing the bit as move through the path
                     if (isRight == true) {
                         expectedHash = proof.binaryProof.rightHash;
                     } else {
@@ -371,6 +430,6 @@ contract StarknetVerifier {
         if (pathBitIndex == -1) {
             return expectedHash;
         }
-        revert("Proof is invalid");
+        revert("length of proof mismatched, invalid proof size!!");
     }
 }
