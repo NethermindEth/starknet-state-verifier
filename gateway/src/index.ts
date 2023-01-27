@@ -1,14 +1,11 @@
 import { Server } from '@chainlink/ccip-read-server';
 import { Command } from 'commander';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import jsonRpcCall from "./RpcCall";
 import { hash, number } from "starknet";
 import { BigNumberish } from "ethers";
 import IStarknetResolver from './IStarknetResolverService.json'
 import StarknetoreContract from './StarknetCoreContract.json'
-import { Fragment, FunctionFragment, Interface, JsonFragment } from '@ethersproject/abi';
-
-//import { toFelt, toHex } from "starknet";
 
 interface MyBinaryProof {
   leftHash: BigNumberish;
@@ -108,20 +105,11 @@ const l1_provider = new ethers.providers.JsonRpcProvider(l1_provider_url);
 
 const server = new Server();
 
-function toInterface(abi: string | readonly (string | Fragment | JsonFragment)[] | Interface) {
-  if (Interface.isInterface(abi)) {
-    return abi;
-  }
-  return new Interface(abi);
-}
 server.add(IStarknetResolver.abi, [
   {
     type: 'addr(bytes32)',
     func: async ([node]: any, { to, data: _callData }) => {
-      // const addrSlot = ethers.utils.keccak256(node + '00'.repeat(31) + '01');
       let myCompositeStateProof: MyStarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
-
-
       try {
         console.log(1, { node, to, _callData, l1_provider_url, l2_resolver_address })
         const blockNumber = (await l1_provider.getBlock('latest')).number
@@ -148,11 +136,6 @@ server.add(IStarknetResolver.abi, [
           });
 
           if (result.contract_data !== undefined) {
-            // console.log('contract data root', result.contract_data.root)
-
-            // console.log('contract data', typeof (result.contract_data.root))
-            // console.log('BigNumber.from', BigNumber.from(result.contract_data.root))
-            // console.log('result.storageAddress', result.contract_data.storageAddress)
             myContractData = {
               contractStateRoot: result.contract_data.root,
               contractAddress: l2_resolver_address,
@@ -169,7 +152,6 @@ server.add(IStarknetResolver.abi, [
                 storage_proof.forEach((element: any) => {
                   myStorageproofs.push(parseProofElement(element));
                 });
-                // myStorageproofs.push(myStorageProof);
               });
             }
           }
@@ -180,9 +162,6 @@ server.add(IStarknetResolver.abi, [
             contractData: myContractData,
             blockNumber: starknetCommittedBlockNumber,
           }
-          //myCompositeStateProof.contractData = myContractData
-          // const encoded = ethers.utils.defaultAbiCoder.encode(fn.outputs!, [tempCompositeStateProof])
-          // console.log('encoded', encoded)
 
           console.log('myCompositeStateProof', JSON.parse(JSON.stringify(myCompositeStateProof)))
         }
