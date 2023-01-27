@@ -15,7 +15,7 @@ program
 // ens registry address -> 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e
 // alchemy url -> https://eth-goerli.alchemyapi.io/v2/ozZ0QV1qPAcGx_irBynNiiLkddGb689w
 
-//yarn start --registry 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e  princeisagreatdeveloper.eth  --l1_provider_url http://https://eth-goerli.alchemyapi.io/v2/ozZ0QV1qPAcGx_irBynNiiLkddGb689w
+//yarn start --registry 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e  princeisagreatdeveloper.eth  --l1_provider_url https://eth-goerli.alchemyapi.io/v2/ozZ0QV1qPAcGx_irBynNiiLkddGb689w
 program.parse(process.argv);
 const options = program.opts();
 const ensAddress = options.registry;
@@ -52,20 +52,20 @@ if (chainId && chainName) {
     const resolver = new ethers.Contract(r.address, StarknetVerifier.abi, provider);
     // const iresolver = new ethers.Contract(r.address, IStarknetResolver.abi, provider);
     try {
-      if (debug) {
-        // this will throw OffchainLookup error
-        // console.log(await resolver.callStatic['addr(bytes32)'](node))
-      } else {
-        // const beforeTime = (new Date()).getTime()
-        // console.log('getAddress           ', await r.getAddress());
-        // const afterTime = (new Date()).getTime()
-        // console.log('(call time=', afterTime - beforeTime, ')')
-        // // console.log('getAddress(60)       ', await r.getAddress(9004));
-        // console.log('_fetchBytes          ', await r._fetchBytes('0xf1cb7e06', '0x000000000000000000000000000000000000000000000000000000000000003c'))
-        // console.log('addr(bytes32)        ', await resolver.callStatic['addr(bytes32)'](node, { ccipReadEnabled: true }))
-        console.log('addr(bytes32,uint256)', await resolver.callStatic['addr(bytes32,uint256)'](node, 9004, { ccipReadEnabled: true }))
-        // console.log('resolveName', await provider.resolveName(name));
-      }
+      console.log('addr(bytes32,uint256)', await resolver.callStatic['addr(bytes32,uint256)'](node, 9004, { ccipReadEnabled: true }))
+      // if (debug) {
+      //   // this will throw OffchainLookup error
+      //   // console.log(await resolver.callStatic['addr(bytes32)'](node))
+      // } else {
+      // const beforeTime = (new Date()).getTime()
+      // console.log('getAddress           ', await r.getAddress());
+      // const afterTime = (new Date()).getTime()
+      // console.log('(call time=', afterTime - beforeTime, ')')
+      // // console.log('getAddress(60)       ', await r.getAddress(9004));
+      // console.log('_fetchBytes          ', await r._fetchBytes('0xf1cb7e06', '0x000000000000000000000000000000000000000000000000000000000000003c'))
+      // console.log('addr(bytes32)        ', await resolver.callStatic['addr(bytes32)'](node, { ccipReadEnabled: true }))
+      // console.log('resolveName', await provider.resolveName(name));
+      // }
     } catch (e) {
       // Manually calling the gateway
       console.log('error', e)
