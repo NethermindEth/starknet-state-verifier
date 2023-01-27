@@ -113,7 +113,7 @@ contract StarknetVerifier is
         __UUPSUpgradeable_init();
     }
 
-    /************************************ENS STUFF */
+    /************************************ENS Resolver Interface specific */
 
     function getl2Resolver() external view returns (uint256) {
         return l2resolver;
@@ -233,6 +233,7 @@ contract StarknetVerifier is
     //         mstore(add(b, 32), mul(a, exp(256, 12)))
     //     }
     // }
+    /************************************ENS Resolver Interface specific END */
 
     function _authorizeUpgrade(address newImplementation)
         internal
