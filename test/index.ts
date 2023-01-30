@@ -179,7 +179,7 @@ describe("Verify", function () {
 
       const proofProxy = await upgrades.deployProxy(
         StarknetVerifier,
-        [pedersenHash.address, starknetCoreContractStub.address],
+        [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:9545/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
         { kind: "uups" }
       );
       proofverifier = await proofProxy.deployed();
@@ -205,7 +205,7 @@ describe("Verify", function () {
     );
 
     const result = await pedersenHash.hash(input);
-    const resultFromStarknetVerifier:BigNumber = await proofverifier.hash(a, b);
+    const resultFromStarknetVerifier: BigNumber = await proofverifier.hash(a, b);
     expect(resultFromStarknetVerifier.toString()).to.be.eq(result[0]);
   });
 

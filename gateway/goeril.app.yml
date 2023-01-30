@@ -1,0 +1,9 @@
+runtime: nodejs14
+entrypoint: 'node dist/index.js --l1_provider_url $L1_PROVIDER_URL --port $PORT --l2_resolver_address $L2_RESOLVER_ADDRESS '
+env_variables:
+  PORT: 8080
+  L2_RESOLVER_ADDRESS: '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'
+  # L1_CHAIN_ID: 5
+  # L2_CHAIN_ID: 420
+includes:
+  - secret.yaml
