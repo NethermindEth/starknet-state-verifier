@@ -57,7 +57,7 @@ const deployAll = async () => {
         [
           "0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1",
           "0xde29d060D45901Fb19ED6C6e959EB22d8626708e",
-          ["https://starknetens.ue.r.appspot.com/{sender}/{data}.json"],
+          ["https://starknetens.ue.r.appspot.com/{sender}/{data}.json"], // per https://eips.ethereum.org/EIPS/eip-3668  the sender and data populated by the client library like ethers.js with data returned by the CCIP enabled contract via revert
           '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'
         ],
         { deployer }
