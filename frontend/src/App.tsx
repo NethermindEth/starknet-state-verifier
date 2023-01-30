@@ -10,16 +10,12 @@ const STORAGE_VAR_NAME = "ERC20_name";
 
 const STORAGE_HASH = starknetKeccak(STORAGE_VAR_NAME);
 
-import * as apiSpecImport from "./utils/api-spec.json";
-import JsonRpcCard from "./components/JsonRpc/JsonRpcCard";
 import EnsProofCard from "./components/ENS/EnsProofCard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import HomePage from "./pages/homepage";
 
 function App() {
-  const [result, setResult] = useState([]);
-  const apiSpec = apiSpecImport as any;
-
   return (
     <Box>
       <Navbar />
@@ -33,9 +29,10 @@ function App() {
         <Box maxW={"5xl"} width={"100%"} p={"10px"}>
           <Alert status="info">
             <AlertIcon />
-            Currently only works in goerli/testnet for Ethereum/Starknet. Mainnet version coming soon..
+            Currently only works in goerli/testnet for Ethereum/Starknet.
+            Mainnet version coming soon..
           </Alert>
-          <EnsProofCard />
+          <HomePage />
           {/*  Not used.*/}
           {/*{apiSpec.methods.map((method: { name: string; params: string[] }, index: React.Key) =>*/}
           {/*  <Box key={method.name}>*/}
