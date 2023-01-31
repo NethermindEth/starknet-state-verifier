@@ -149,7 +149,7 @@ contract StarknetVerifier is
                 uint256ToBytes(
                     _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
                 );
-        } else if (coinType == 60) {
+        } else if (coinType == 9004) {
             // 9004 for strk address
             return
                 uint256ToBytes(
