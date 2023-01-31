@@ -97,7 +97,7 @@ const deployAll = async () => {
 
       const proofProxy = await upgrades.deployProxy(
         StarknetVerifier,
-        [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:9545/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
+        [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
         { deployer }
       );
       proofverifier = await proofProxy.deployed();
