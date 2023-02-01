@@ -21,6 +21,7 @@ import { BigNumber, Contract, ethers } from "ethers";
 import { CopyIcon } from "@chakra-ui/icons";
 import { useContract, useEnsResolver, useProvider } from "wagmi";
 import resolverAbi from "../../abi/StarknetVerifier.json";
+import StarknetContractInteraction from "../Starknet/ContractInteraction";
 
 interface INameResolver {
   name: string;
@@ -62,7 +63,9 @@ const NameResolver: React.FC<INameResolver> = ({ name, nameHash }) => {
 
   const [activeCoinNumber, setActiveCoinNumber] = useState(9004);
 
-  const [ccipResolvedValue, setCcipResolvedValue] = useState<null|string>(null);
+  const [ccipResolvedValue, setCcipResolvedValue] = useState<null | string>(
+    null
+  );
   const [ccipLoading, setCcipLoading] = useState(false);
 
   useEffect(() => {
@@ -215,7 +218,7 @@ const NameResolver: React.FC<INameResolver> = ({ name, nameHash }) => {
             onChange={(e) => {
               setActiveCoinNumber(parseInt(e.target.value));
             }}
-          > 
+          >
             {coinNumbers.map((coinNumber) => {
               return (
                 <option key={coinNumber.id} value={coinNumber.id}>
@@ -232,7 +235,9 @@ const NameResolver: React.FC<INameResolver> = ({ name, nameHash }) => {
             "FETCH CCIP VALUE"
           )}
         </Button>
-        <Text wordBreak={"break-all"}>{resolveCcipValueMessage(ccipResolvedValue)}</Text>
+        <Text wordBreak={"break-all"}>
+          {resolveCcipValueMessage(ccipResolvedValue)}
+        </Text>
       </VStack>
     </Box>
   ) : (
@@ -286,11 +291,11 @@ const ENSNameResolver = () => {
 
   return (
     <Box>
-      <Flex direction={{ base: "column"}} alignItems={"center"} mb={"35px"}>
+      <Flex direction={{ base: "column" }} alignItems={"center"} mb={"35px"}>
         <FormLabel
           htmlFor="ensName"
           display={"block"}
-          w={{ base: "100%"}}
+          w={{ base: "100%" }}
           fontWeight="bold"
           fontSize={"lg"}
         >
@@ -310,7 +315,9 @@ const ENSNameResolver = () => {
         />
       </Flex>
       <Box my={"10px"}>
-        <Text wordBreak={"break-all"}>Calculated namehash: {ensName.nameHash}</Text>
+        <Text wordBreak={"break-all"}>
+          Calculated namehash: {ensName.nameHash}
+        </Text>
         <Box
           display={"flex"}
           flexDirection={{ base: "column", md: "row" }}
@@ -349,6 +356,9 @@ const ENSNameResolver = () => {
       </Box>
       <Box>
         <NameResolver name={ensName.name} nameHash={ensName.nameHash} />
+      </Box>
+      <Box>
+        <StarknetContractInteraction parentRootHash={maskedNameHash} />
       </Box>
     </Box>
   );

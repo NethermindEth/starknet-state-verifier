@@ -16,6 +16,8 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 // import * as dotenv from 'dotenv'
 // dotenv.config();
 const localChain: Chain = {
@@ -75,6 +77,8 @@ const { chains, provider } = configureChains(
   { stallTimeout: 5000 }
 );
 
+const queryClient = new QueryClient();
+
 const client = createClient({
   autoConnect: true,
   connectors: [
@@ -93,9 +97,11 @@ const client = createClient({
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ChakraProvider>
-      <WagmiConfig client={client}>
-        <App />
-      </WagmiConfig>
+      <QueryClientProvider client={queryClient}>
+        <WagmiConfig client={client}>
+          <App />
+        </WagmiConfig>
+      </QueryClientProvider>
     </ChakraProvider>
   </React.StrictMode>
 );

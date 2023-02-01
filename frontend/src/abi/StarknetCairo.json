@@ -1,0 +1,90 @@
+[
+  {
+    "data": [
+      {
+        "name": "implementation",
+        "type": "felt"
+      }
+    ],
+    "keys": [],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "data": [
+      {
+        "name": "previousAdmin",
+        "type": "felt"
+      },
+      {
+        "name": "newAdmin",
+        "type": "felt"
+      }
+    ],
+    "keys": [],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "name": "proxy_admin",
+        "type": "felt"
+      }
+    ],
+    "name": "initializer",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "domain_node",
+        "type": "felt"
+      }
+    ],
+    "name": "resolve",
+    "outputs": [
+      {
+        "name": "starknet_id",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "domain_node",
+        "type": "felt"
+      },
+      {
+        "name": "starknet_id",
+        "type": "felt"
+      },
+      {
+        "name": "proof_len",
+        "type": "felt"
+      },
+      {
+        "name": "proof",
+        "type": "felt*"
+      }
+    ],
+    "name": "set_starknet_id",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "new_implementation",
+        "type": "felt"
+      }
+    ],
+    "name": "upgrade",
+    "outputs": [],
+    "type": "function"
+  }
+]
