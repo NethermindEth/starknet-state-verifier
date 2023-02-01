@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 enum NodeType {
     BINARY,
@@ -71,7 +72,8 @@ interface StarknetCoreContract {
 contract StarknetVerifier is
     Initializable,
     OwnableUpgradeable,
-    UUPSUpgradeable
+    UUPSUpgradeable,
+    ERC165
 {
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
@@ -79,6 +81,8 @@ contract StarknetVerifier is
     uint256 public l2resolver;
     PedersenHash public pedersen;
     StarknetCoreContract public starknetCoreContract;
+    bytes4 private constant ADDR_INTERFACE_ID = 0x3b3b57de;
+    bytes4 private constant ADDRESS_INTERFACE_ID = 0xf1cb7e06;
 
     error OffchainLookup(
         address sender,
@@ -129,9 +133,8 @@ contract StarknetVerifier is
     }
 
     // function addr(bytes32 node) public view returns (address) {
-    //     // the namehash always hash to be MASKED against 250 bits to simulate sn_keccak
-    //     uint256 starknetNode = uint256(node) & MASK_250;
-    //     return _addr(starknetNode, StarknetVerifier.addrWithProof.selector);
+    //
+    //     return addr(node, 60);
     // }
 
     function addr(bytes32 node, uint256 coinType)
@@ -139,14 +142,21 @@ contract StarknetVerifier is
         view
         returns (bytes memory)
     {
-        if (coinType == 9004) {
-            // TODO: not sure this should be 60 for ETH or 9004 for starknet
+        if (coinType == 60) {
+            // replicated logic to demonstrate CCIP reslution on the ens app, as starknet address will not resolve so we are just resolving eth address.
+            // 60 for eth address
+            return
+                uint256ToBytes(
+                    _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
+                );
+        } else if (coinType == 9004) {
+            // 9004 for strk address
             return
                 uint256ToBytes(
                     _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
                 );
         } else {
-            return uint256ToBytes(0);
+            return addressToBytes(address(0));
         }
     }
 
@@ -155,9 +165,6 @@ contract StarknetVerifier is
         view
         returns (uint256)
     {
-        // uint256 storageVarAddress = calculateDomainStorageVarAddressFor(
-        //     uint256(node)
-        // );
         uint256 starknetNode = uint256(node) & MASK_250;
 
         bytes memory callData = abi.encodeWithSelector(
@@ -212,12 +219,25 @@ contract StarknetVerifier is
             proof.storageProofArray
         );
 
-        // // require(verifyStateRootProof(proof), "Invalid state root");
-        // // bytes32 slot = keccak256(abi.encodePacked(node, uint256(1)));
-        // // bytes32 value = getStorageValue(l2resolver, slot, proof);
-        // // return address(uint160(uint256(value)));
-        // console.log("_addrWithProof");
         return starknetAddress;
+    }
+
+    function supportsInterface(bytes4 interfaceID)
+        public
+        pure
+        override
+        returns (bool)
+    {
+        return
+            interfaceID == ADDR_INTERFACE_ID ||
+            interfaceID == ADDRESS_INTERFACE_ID;
+    }
+
+    function addressToBytes(address a) internal pure returns (bytes memory b) {
+        b = new bytes(20);
+        assembly {
+            mstore(add(b, 32), mul(a, exp(256, 12)))
+        }
     }
 
     function uint256ToBytes(uint256 x) private pure returns (bytes memory b) {
@@ -227,12 +247,6 @@ contract StarknetVerifier is
         }
     }
 
-    // function uint256ToBytes(uint256 a) internal pure returns (bytes memory b) {
-    //     b = new bytes(32);
-    //     assembly {
-    //         mstore(add(b, 32), mul(a, exp(256, 12)))
-    //     }
-    // }
     /************************************ENS Resolver Interface specific END */
 
     function _authorizeUpgrade(address newImplementation)
@@ -373,14 +387,17 @@ contract StarknetVerifier is
         return storageVarValue;
     }
 
+    // takes in two uint256 (a,b) values and returns true if the bits in the range [bitIndex, bitIndex + length - 1] of 'a' is equal to 'b' are equal.
     function compareBitsWithStartIndexAndLength(
         uint256 a,
         uint256 b,
-        uint256 startIndex,
+        uint256 bitIndex,
         uint256 length
     ) public pure returns (bool) {
-        uint256 mask = (1 << length) - 1;
-        return ((a >> startIndex) & mask) == ((b >> startIndex) & mask);
+        uint256 msbitsToChopOff = 255 - bitIndex;
+        uint256 aExtracted = ((a << msbitsToChopOff) >> msbitsToChopOff) >>
+            (bitIndex - (length - 1));
+        return aExtracted == b;
     }
 
     // A generic method to verify a proof against a root hash and a path.
@@ -417,9 +434,17 @@ contract StarknetVerifier is
                     }
                     pathBitIndex--;
                 } else {
-                    // if (path != proof.edgeProof.path) {
-                    //     revert("Proof is invalid");
-                    // }
+                    bool isPathEqual = compareBitsWithStartIndexAndLength(
+                        path,
+                        proof.edgeProof.path,
+                        uint256(pathBitIndex),
+                        proof.edgeProof.length
+                    );
+                    if (isPathEqual != true) {
+                        revert(
+                            "Invalid proof, potentially a proof for a different path/ non inclusion"
+                        );
+                    }
                     expectedHash = proof.edgeProof.childHash;
                     int256 edgePathLength = int256(proof.edgeProof.length);
                     pathBitIndex -= edgePathLength;
