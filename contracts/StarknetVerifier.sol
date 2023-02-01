@@ -132,10 +132,14 @@ contract StarknetVerifier is
         return hash(storageVarName, domain);
     }
 
-    // function addr(bytes32 node) public view returns (address) {
-    //
-    //     return addr(node, 60);
-    // }
+    function addr(bytes32 node) public view returns (address) {
+        return
+            address(
+                uint160(
+                    _addr(node, StarknetVerifier.bytesAddrWithProof.selector)
+                )
+            );
+    }
 
     function addr(bytes32 node, uint256 coinType)
         public
@@ -440,9 +444,9 @@ contract StarknetVerifier is
                         uint256(pathBitIndex),
                         proof.edgeProof.length
                     );
-                    if (isPathEqual != true) {
+                    if (isPathEqual == false) {
                         revert(
-                            "Invalid proof, potentially a proof for a different path/ non inclusion"
+                            "Invalid proof, potentially a proof for a different storage var/ non inclusion"
                         );
                     }
                     expectedHash = proof.edgeProof.childHash;
