@@ -59,7 +59,7 @@ interface IVerificationResult {
   data?: any;
 }
 
-const VERIFIER_ADDRESS = "0x995c2A07cd092AC5E4bCB655B9C0e58FFB952d70"; // this is on goerli, plus update in the UI field to your custom deployment
+const VERIFIER_ADDRESS = "0x90504c1156fDd2D269f73690F0359f307F7902f7"; // this is on goerli, plus update in the UI field to your custom deployment
 
 const VerifyProof: React.FC<Props> = (props: Props) => {
   const {
