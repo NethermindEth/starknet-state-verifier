@@ -12,10 +12,12 @@
     "ethereumjs-abi": "https://registry.npmjs.org/ethereumjs-abi/-/ethereumjs-abi-0.6.8.tgz"
   },
   "dependencies": {
+    "@argent/get-starknet": "^5.2.0",
     "@chakra-ui/icons": "^2.0.13",
     "@chakra-ui/react": "^2.4.3",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@tanstack/react-query": "^4.24.4",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "framer-motion": "^7.6.19",
