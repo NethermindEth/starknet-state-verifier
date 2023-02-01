@@ -4,11 +4,6 @@ import { Alert, AlertIcon, Box, Container, Flex } from "@chakra-ui/react";
 import { starknetKeccak } from "starknet/utils/hash";
 import JsonRpcForm from "./components/JsonRpc/JsonRpcForm";
 
-const CONTRACT_ADDRESS =
-  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
-const STORAGE_VAR_NAME = "ERC20_name";
-
-const STORAGE_HASH = starknetKeccak(STORAGE_VAR_NAME);
 
 import EnsProofCard from "./components/ENS/EnsProofCard";
 import Navbar from "./components/Navbar";
