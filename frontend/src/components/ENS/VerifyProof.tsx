@@ -20,7 +20,7 @@ import StarknetVerifier from "../../abi/StarknetVerifier.json";
 import { Spinner } from "@chakra-ui/react";
 
 import { EnsProofCardState } from "./EnsProofCard";
-import { L1_EXPLORER_BASE_URL, L2_EXPLORER_BASE_URL } from "../../constants";
+import { L1_EXPLORER_BASE_URL, L2_EXPLORER_BASE_URL, L1_RESOLVER_VERIFIER_ADDRESS } from "../../constants";
 import { ArrowDownIcon } from "@chakra-ui/icons";
 
 interface Props {
@@ -59,7 +59,7 @@ interface IVerificationResult {
   data?: any;
 }
 
-const VERIFIER_ADDRESS = "0x90504c1156fDd2D269f73690F0359f307F7902f7"; // this is on goerli, plus update in the UI field to your custom deployment
+const VERIFIER_ADDRESS = L1_RESOLVER_VERIFIER_ADDRESS; // this is on goerli, plus update in the UI field to your custom deployment
 
 const VerifyProof: React.FC<Props> = (props: Props) => {
   const {
@@ -78,7 +78,6 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
 
   const availableVeriferAddresses = [
     VERIFIER_ADDRESS,
-    "0x04599D9552f1d6b4e4e9df4cEB453BAd60AdeDBF",
   ];
 
   // const [starknetStateRoot, setStarknetStateRoot] = useState('');
