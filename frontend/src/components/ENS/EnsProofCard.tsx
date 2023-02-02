@@ -67,7 +67,7 @@ const EnsProofCard = () => {
   const [
     proofCardState, setProofCardState
   ] = useState<EnsProofCardState>({
-    contractAddress: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7", // default eth erc20 contract
+    contractAddress: "0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3", // https://github.com/starknet-id/ens_resolver/blob/3577d3bf3e309614dbec16aca56b7cade2bac949/src/main.cairo#L7
     ethereumBlockNumber: "",
     starknetCommitmentBlockNumber: "",
     storageAddress: ""
