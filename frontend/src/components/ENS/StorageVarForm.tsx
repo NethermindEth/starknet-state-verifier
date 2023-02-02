@@ -29,8 +29,10 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
   const toast = useToast();
 
   const [storageVarFormState, setStorageVarFormState] = useState({
-    name: "ERC20_balances", // some defaults for this contract -> 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
-    args: "0x01C62c52C1709aCB3EB9195594E39C04323658463Cfe0c641e39b99a83ba11a1"
+    // some defaults for this contract -> 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3
+    // which is an instance of the contract at https://github.com/starknet-id/ens_resolver/blob/master/src/main.cairo#L7 (commit # 3577d3b)
+    name: "resolver",
+    args: "0x00042c0c612d940ecb5555f911731754a3481cb0705a3568f85ad6a25d14bad2" // this is the namehash of "princeisagreatdeveloper.eth" masked with 250 bits to simulate sn_keccak.
   });
 
   useEffect(() => {
