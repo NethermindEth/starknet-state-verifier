@@ -331,7 +331,7 @@ const ENSNameResolver = () => {
             placement={"top-start"}
           >
             <Text fontSize={"lg"} fontWeight={"bold"} wordBreak={"break-all"}>
-              Masked Namehash:{" "}
+              250 bit namehash:{" "}
               <Box as="span" display={"inline-block"} color={"green"}>
                 {maskedNameHash}
               </Box>

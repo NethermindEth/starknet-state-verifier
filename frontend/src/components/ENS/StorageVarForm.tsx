@@ -17,6 +17,7 @@ import {
 import React, { Key, useEffect, useState } from "react";
 import { pedersen, starknetKeccak } from "starknet/utils/hash";
 import { toFelt, toHex } from "starknet/utils/number";
+import { L2_RESOLVER_STORAGE_VAR_NAME } from "../../constants";
 
 
 interface Props {
@@ -29,9 +30,8 @@ const StorageVarForm: React.FC<Props> = ({ setStorageAddress }) => {
   const toast = useToast();
 
   const [storageVarFormState, setStorageVarFormState] = useState({
-    // some defaults for this contract -> 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3
-    // which is an instance of the contract at https://github.com/starknet-id/ens_resolver/blob/master/src/main.cairo#L7 (commit # 3577d3b)
-    name: "resolver",
+    // some defaults for this contract -> L2_RESOLVER_ADDRESS 
+    name: L2_RESOLVER_STORAGE_VAR_NAME,
     args: "0x00042c0c612d940ecb5555f911731754a3481cb0705a3568f85ad6a25d14bad2" // this is the namehash of "princeisagreatdeveloper.eth" masked with 250 bits to simulate sn_keccak.
   });
 

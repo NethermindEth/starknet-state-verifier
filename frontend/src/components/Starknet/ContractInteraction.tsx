@@ -268,7 +268,7 @@ const StarknetContractInteraction: React.FC<IStarknetContractInteraction> = ({
       borderStyle={"dashed"}
     >
       <Heading variant={"h3"} fontSize={"xl"} textAlign={"center"}>
-        Interact with Starknet Deployed Contract
+        Interact with Starknet Deployed L2 Resolver(update your domain to address mapping)
       </Heading>
       <Box>
         {walletState.isConnected ? (
@@ -388,9 +388,8 @@ const StarknetContractInteraction: React.FC<IStarknetContractInteraction> = ({
                     <Text
                       wordBreak={"break-all"}
                       color={"purple.400"}
-                    >{`call set_starknet_id(${nameHash}, ${
-                      starknetFnParams.new_id
-                    }, [${starknetFnParams.proofs.split(",")}])`}</Text>
+                    >{`call set_starknet_id(${nameHash}, ${starknetFnParams.new_id
+                      }, [${starknetFnParams.proofs.split(",")}])`}</Text>
                     <Button my={"10px"} onClick={sendTransaction}>
                       Set New Value
                     </Button>

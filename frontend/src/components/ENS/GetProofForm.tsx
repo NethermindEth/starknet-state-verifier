@@ -24,6 +24,7 @@ import { useAccount, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { EnsProofCardState, EnsProofCardStateKeys } from "./EnsProofCard";
 import { CheckCircleIcon } from "@chakra-ui/icons";
+import { STARKNET_CORE_CONTRACT_ADDRESS } from "../../constants";
 
 interface Props {
   state: EnsProofCardState;
@@ -54,7 +55,7 @@ const GetProofForm: React.FC<Props> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [starknetCoreContractAddress, setStarknetCoreContractAddress] =
-    useState<string>("0xde29d060D45901Fb19ED6C6e959EB22d8626708e");
+    useState<string>(STARKNET_CORE_CONTRACT_ADDRESS);
 
   const [coreContractRootState, setContractRootState] =
     useState<StarknetCoreContractState>({
@@ -150,7 +151,7 @@ const GetProofForm: React.FC<Props> = ({
     return () => clearInterval(id);
   }, [coreContractRootState]);
 
-  
+
   const { connector: activeConnector, isConnected } = useAccount();
 
   const { connect, connectors, error, pendingConnector } = useConnect({
@@ -199,7 +200,7 @@ const GetProofForm: React.FC<Props> = ({
     // Call the JSON-RPC method with the given params
     // and pass the result to the onResult callback
     const result = await jsonRpcCall("pathfinder_getProof", args);
-    console.log({result});
+    console.log({ result });
 
     setState({
       ...state,
