@@ -11,6 +11,7 @@ yarn dev
 ## Deploy contracts
 From the root folder run the following
 ```shell
+cd contracts
 yarn install
 cp .env.example .env
 npx hardhat run <--network yournetwork > scripts/deploy.ts
@@ -19,6 +20,7 @@ npx hardhat run <--network yournetwork > scripts/deploy.ts
 ## Run contract tests
 From the root folder run the following
 ```shell
+cd contracts
 npx hardhat test
 ```
 
