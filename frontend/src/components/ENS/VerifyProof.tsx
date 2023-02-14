@@ -27,24 +27,24 @@ interface Props {
   state: EnsProofCardState;
 }
 
-interface MyBinaryProof {
+interface BinaryProof {
   leftHash: BigNumberish;
   rightHash: BigNumberish;
 }
 
-interface MyEdgeProof {
+interface EdgeProof {
   childHash: BigNumberish;
   path: BigNumberish;
   length: BigNumberish;
 }
 
-interface MyStarknetProof {
+interface StarknetProof {
   nodeType: BigNumberish;
-  binaryProof: MyBinaryProof;
-  edgeProof: MyEdgeProof;
+  binaryProof: BinaryProof;
+  edgeProof: EdgeProof;
 }
 
-interface MyContractData {
+interface StarknetContractData {
   contractStateRoot: BigNumberish;
   contractAddress: BigNumberish;
   storageVarAddress: BigNumberish;
@@ -90,7 +90,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
   const [verificationResult, setVerificationResult] =
     useState<IVerificationResult>();
   const [submit, setSubmit] = useState(false);
-  const [contractData, setContractData] = useState<MyContractData>();
+  const [contractData, setContractData] = useState<StarknetContractData>();
 
   const readContractVerifier = useContractRead({
     address: verifierAddress,
@@ -141,7 +141,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
     },
   });
 
-  function parseProofElement(element: any): MyStarknetProof {
+  function parseProofElement(element: any): StarknetProof {
     console.log(element);
     if (element.binary != undefined) {
       return {
@@ -213,7 +213,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
       return;
     }
 
-    const _contractData: MyContractData = {
+    const _contractData: StarknetContractData = {
       contractStateRoot: proof.contract_data?.root || "0x0",
       contractAddress: contractAddress!,
       storageVarAddress: storageAddress!,

@@ -1,17 +1,17 @@
 {
   "version": "0.2.1",
   "license": "MIT",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node  dist/index.js",
+    "start": "node dist/index.js",
     "build": "tsc -b",
     "gcp-build": "tsc -b",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "tsc -b",
+    "prepare": "NODE_ENV=development tsc -b",
     "clean": "rm -fr node_modules dist"
   },
   "husky": {
@@ -25,18 +25,14 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "sn-resolver-gateway",
-  "author": "Fawad Haider",
+  "name": "shared_lib",
+  "author": "fawad haider",
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.5.5",
     "@types/node": "^16.3.3",
-    "esbuild-kit": "^0.0.3",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@chainlink/ccip-read-server": "^0.2.1",
-    "eth-ens-namehash": "^2.0.8",
     "ethers": "^5.0.25",
     "starknet": "^4.17.1",
     "tsdx": "^0.14.1"

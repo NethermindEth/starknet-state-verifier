@@ -4,6 +4,7 @@ coverage
 coverage.json
 typechain
 .openzeppelin
+tsconfig.tsbuildinfo
 
 #Hardhat files
 cache

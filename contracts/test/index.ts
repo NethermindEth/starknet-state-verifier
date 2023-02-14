@@ -5,65 +5,8 @@ import path from "path";
 import { PedersenHash } from "../typechain";
 import { BigNumber, BigNumberish } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { parseStarknetProof, StarknetProof, StarknetCompositeStateProof, BinaryProof, EdgeProof } from '../../shared_lib/src'
 
-interface BinaryProof {
-  leftHash: BigNumberish;
-  rightHash: BigNumberish;
-}
-
-interface EdgeProof {
-  childHash: BigNumberish;
-  path: BigNumberish;
-  length: BigNumberish;
-}
-
-interface StarknetProof {
-  nodeType: BigNumberish;
-  binaryProof: BinaryProof;
-  edgeProof: EdgeProof;
-}
-
-interface MyContractData {
-  contractStateRoot: BigNumberish;
-  contractAddress: BigNumberish;
-  storageVarAddress: BigNumberish;
-  classHash: BigNumberish;
-  hashVersion: BigNumberish;
-  nonce: BigNumberish;
-}
-
-function parseProofElement(element: any): StarknetProof {
-  // console.log(JSON.stringify(element));
-  if (element.binary != undefined) {
-    return {
-      nodeType: 0,
-      binaryProof: {
-        leftHash: element.binary.left,
-        rightHash: element.binary.right,
-      },
-      edgeProof: {
-        childHash: 0,
-        path: 0,
-        length: 0,
-      },
-    };
-  } else if (element.edge != undefined) {
-    return {
-      nodeType: 1,
-      binaryProof: {
-        leftHash: 0,
-        rightHash: 0,
-      },
-      edgeProof: {
-        childHash: element.edge.child,
-        path: element.edge.path.value,
-        length: element.edge.path.len,
-      },
-    };
-  } else {
-    throw new Error("Invalid proof element");
-  }
-}
 
 const deployTables = async () => {
   let precomputedContracts: any[64] = [];
@@ -107,41 +50,20 @@ describe("Verify", function () {
     console.log("Reading file: " + jsonFile);
     var filepath = path.resolve(__dirname, jsonFile);
     console.log("Filepath: " + filepath);
-
-    let myContractProofs: StarknetProof[] = [];
-    let myStorageproofs: StarknetProof[] = [];
-    var originalParse = JSON.parse(fs.readFileSync(filepath, "utf8"));
-
-    originalParse.result.contract_proof.forEach((element: any) => {
-      myContractProofs.push(parseProofElement(element));
-    });
-
-    // zero index for a single proof. the API supports multiple proofs but currently we only support one proof verification
-    originalParse.result.contract_data.storage_proofs[0].forEach(
-      (element: any) => {
-        myStorageproofs.push(parseProofElement(element));
-      }
-    );
-
-    const contractStateRoot = originalParse.result.contract_data.root;
-    const contractData: MyContractData = {
-      contractStateRoot: contractStateRoot,
-      contractAddress: contractAddress,
-      storageVarAddress: storageVarAddress,
-      classHash: originalParse.result.contract_data.class_hash,
-      hashVersion:
-        originalParse.result.contract_data.contract_state_hash_version,
-      nonce: originalParse.result.contract_data.nonce,
-    };
-
     let coreContractBlockNumber =
       await starknetCoreContractStub.stateBlockNumber();
+
+    // let myContractProofs: StarknetProof[] = [];
+    // let myStorageproofs: StarknetProof[] = [];
+    var originalParse = JSON.parse(fs.readFileSync(filepath, "utf8"));
+    var compositeProof: StarknetCompositeStateProof = parseStarknetProof(originalParse.result, contractAddress, storageVarAddress, coreContractBlockNumber);
+
     console.log("Core contract block number: " + coreContractBlockNumber);
     const result = await proofverifier.verifiedStorageValue(
       coreContractBlockNumber,
-      contractData,
-      myContractProofs,
-      myStorageproofs
+      compositeProof.contractData,
+      compositeProof.contractProofArray,
+      compositeProof.storageProofArray
     );
 
     return result;

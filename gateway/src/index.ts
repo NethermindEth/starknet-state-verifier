@@ -1,46 +1,15 @@
 import { Server } from '@chainlink/ccip-read-server';
 import { Command } from 'commander';
 import { ethers } from 'ethers';
-import jsonRpcCall from "./RpcCall";
 import { hash, number } from "starknet";
 import { BigNumberish } from "ethers";
 import IStarknetResolver from './IStarknetResolverService.json'
 import StarknetoreContract from './StarknetCoreContract.json'
+import { parseStarknetProof, StarknetProof, StarknetCompositeStateProof, BinaryProof, EdgeProof, getStarknetProof } from '../../shared_lib';
 
-interface MyBinaryProof {
-  leftHash: BigNumberish;
-  rightHash: BigNumberish;
-}
-
-interface MyEdgeProof {
-  childHash: BigNumberish;
-  path: BigNumberish;
-  length: BigNumberish;
-}
-
-interface MyStarknetProof {
-  nodeType: BigNumberish;
-  binaryProof: MyBinaryProof;
-  edgeProof: MyEdgeProof;
-}
-
-interface MyContractData {
-  contractStateRoot: BigNumberish;
-  contractAddress: BigNumberish;
-  storageVarAddress: BigNumberish;
-  classHash: BigNumberish;
-  hashVersion: BigNumberish;
-  nonce: BigNumberish;
-}
-
-interface MyStarknetCompositeStateProof {
-  blockNumber: BigNumberish;
-  contractData: MyContractData;
-  contractProofArray: MyStarknetProof[];
-  storageProofArray: MyStarknetProof[];
-}
-
+const RPC_URL = 'https://pathfinder-goerli.nethermind.io/rpc/v0.2';
 const CORE_CONTRACT_ADDRESS = '0xde29d060D45901Fb19ED6C6e959EB22d8626708e'
+
 // const L2_RESOLVER_ADDRESS = '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'
 
 // const namehash = require('eth-ens-namehash');
@@ -57,38 +26,6 @@ const computeStorageAddress = (name: string, keys: string[]) => {
   return number.toHex(res);
 }
 
-function parseProofElement(element: any): MyStarknetProof {
-  // console.log(element)
-  if (element.binary != undefined) {
-    return {
-      nodeType: 0,
-      binaryProof: {
-        leftHash: element.binary.left,
-        rightHash: element.binary.right,
-      },
-      edgeProof: {
-        childHash: 0,
-        path: 0,
-        length: 0,
-      },
-    };
-  } else if (element.edge != undefined) {
-    return {
-      nodeType: 1,
-      binaryProof: {
-        leftHash: 0,
-        rightHash: 0,
-      },
-      edgeProof: {
-        childHash: element.edge.child,
-        path: element.edge.path.value,
-        length: element.edge.path.len,
-      },
-    };
-  } else {
-    throw new Error("Invalid proof element");
-  }
-}
 
 
 const program = new Command();
@@ -109,62 +46,15 @@ server.add(IStarknetResolver.abi, [
   {
     type: 'addr(bytes32)',
     func: async ([node]: any, { to, data: _callData }) => {
-      let myCompositeStateProof: MyStarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
+      let myCompositeStateProof: StarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
       try {
         console.log(1, { node, to, _callData, l1_provider_url, l2_resolver_address })
         const blockNumber = (await l1_provider.getBlock('latest')).number
         let starknetCoreContract = new ethers.Contract(CORE_CONTRACT_ADDRESS, StarknetoreContract.abi, l1_provider);
         const starknetCommittedBlockNumber = await starknetCoreContract.stateBlockNumber({ blockTag: blockNumber })
         const storageVarAddress = computeStorageAddress('resolver', [node])
-
-        let blockArg = { 'block_number': starknetCommittedBlockNumber.toNumber() }
-        const args = [
-          blockArg,
-          l2_resolver_address,
-          [storageVarAddress]
-        ];
-
-        const result = await jsonRpcCall("pathfinder_getProof", args);
-        console.log('result', JSON.stringify(result))
-
-        if (result.contract_proof !== undefined) {
-          let myContractProofs: any = [];
-          let myStorageproofs: any = [];
-          let myContractData: any = {};
-          result.contract_proof.forEach((element: any) => {
-            myContractProofs.push(parseProofElement(element));
-          });
-
-          if (result.contract_data !== undefined) {
-            myContractData = {
-              contractStateRoot: result.contract_data.root,
-              contractAddress: l2_resolver_address,
-              storageVarAddress: storageVarAddress,
-              classHash: result.contract_data.class_hash,
-              hashVersion: result.contract_data.contract_state_hash_version,
-              nonce: result.contract_data.nonce
-            }
-
-            // console.log('contract data', result.contract_data)
-            if (result.contract_data.storage_proofs !== undefined) {
-              result.contract_data.storage_proofs.forEach((storage_proof: any) => {
-                let myStorageProof: any = [];
-                storage_proof.forEach((element: any) => {
-                  myStorageproofs.push(parseProofElement(element));
-                });
-              });
-            }
-          }
-
-          myCompositeStateProof = {
-            contractProofArray: myContractProofs,
-            storageProofArray: myStorageproofs,
-            contractData: myContractData,
-            blockNumber: starknetCommittedBlockNumber,
-          }
-
-          console.log('myCompositeStateProof', JSON.parse(JSON.stringify(myCompositeStateProof)))
-        }
+        myCompositeStateProof = await getStarknetProof(RPC_URL, l2_resolver_address, storageVarAddress, starknetCommittedBlockNumber)
+        console.log('myCompositeStateProof', JSON.parse(JSON.stringify(myCompositeStateProof)))
       } catch (e) {
         console.log(e)
       }
