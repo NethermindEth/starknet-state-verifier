@@ -1,0 +1,6 @@
+ecdsa
+fastecdsa
+sympy
+cairo-lang
+starknet-py
+black
