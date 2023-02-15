@@ -1,6 +1,7 @@
 
 // The URL of the JSON-RPC server
-const RPC_URL = 'https://pathfinder-goerli.nethermind.io/rpc/v0.2';
+
+import { PATHFINDER_RPC_URL } from "../constants";
 
 // The JSON-RPC version
 const JSON_RPC_VERSION = '2.0';
@@ -27,7 +28,7 @@ async function jsonRpcCall(methodName: string, params: any[]): Promise<any> {
 
   // Send the request and return the result
   // Make the JSON-RPC call using the fetch function
-  const response1 = await fetch(RPC_URL, {
+  const response1 = await fetch(PATHFINDER_RPC_URL, {
     method: 'POST',
     body: JSON.stringify(request),
     headers: {

@@ -1,17 +1,17 @@
 {
-  "version": "0.2.1",
+  "version": "0.0.3",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
   "engines": {
     "node": ">=10"
   },
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc -b",
-    "gcp-build": "tsc -b",
+    "build": "tsdx build",
+    "gcp-build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "NODE_ENV=development tsc -b",
+    "prepare": "NODE_ENV=development tsdx build",
     "clean": "rm -fr node_modules dist"
   },
   "husky": {
@@ -25,7 +25,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "shared_lib",
+  "name": "pathfinder_getproof_lib",
   "author": "fawad haider",
   "devDependencies": {
     "@types/node": "^16.3.3",

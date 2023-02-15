@@ -2,15 +2,10 @@ import JsonRpcForm from "../JsonRpc/JsonRpcForm";
 import { border, Box, Button, Card, Collapse, Divider, FormLabel, Heading, HStack, Input, Text, useColorModeValue, VStack } from "@chakra-ui/react";
 import React, { Key, useEffect, useState } from "react";
 import JsonRpcResponse from "../JsonRpc/JsonRpcResponse";
-import { ChevronRightIcon, ChevronUpIcon } from '@chakra-ui/icons'
-import { pedersen, starknetKeccak } from "starknet/utils/hash";
 import StorageVarForm from "./StorageVarForm";
-import JsonRpcCard from "../JsonRpc/JsonRpcCard";
 import VerifyProof from "./VerifyProof";
-import ConnectWallet from "../ConnectWallet";
 import GetProofForm from "./GetProofForm";
-import { L2_RESOLVER_ADDRESS } from "../../constants";
-
+import { L2_RESOLVER_ADDRESS, PATHFINDER_RPC_URL } from "../../constants";
 
 const getProofMethod = {
   "name": "pathfinder_getProof",
@@ -45,25 +40,17 @@ const getProofMethod = {
 
 export type EnsProofCardStateKeys = "storageAddress" | "contractAddress" | "ethereumBlockNumber" | "starknetCommitmentBlockNumber" | "proof";
 export interface EnsProofCardState {
-  storageAddress?: string;
-  contractAddress?: string;
+  storageAddress: string;
+  contractAddress: string;
   ethereumBlockNumber?: string;
-  starknetCommitmentBlockNumber?: string;
-  proof?: {
-    contract_proof: any[],
-    contract_data?: {
-      class_hash: string,
-      nonce: string,
-      root: string,
-      contract_state_hash_version: string,
-      storage_proofs: any[]
-    }
-  };
-}
+  starknetCommitmentBlockNumber: string;
+  proof?: any;// should be jsonrpc response
+};
+
 
 const EnsProofCard = () => {
 
-  const gatewayAddress = 'https://pathfinder-goerli.nethermind.io/rpc/v0.2';
+  const gatewayAddress = PATHFINDER_RPC_URL
 
   const [
     proofCardState, setProofCardState

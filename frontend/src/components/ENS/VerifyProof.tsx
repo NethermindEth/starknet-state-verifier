@@ -22,36 +22,12 @@ import { Spinner } from "@chakra-ui/react";
 import { EnsProofCardState } from "./EnsProofCard";
 import { L1_EXPLORER_BASE_URL, L2_EXPLORER_BASE_URL, L1_RESOLVER_VERIFIER_ADDRESS } from "../../constants";
 import { ArrowDownIcon } from "@chakra-ui/icons";
+import { StarknetContractData, StarknetCompositeStateProof, StarknetProof, parseStarknetProof } from "pathfinder_getproof_lib";
 
 interface Props {
   state: EnsProofCardState;
 }
 
-interface BinaryProof {
-  leftHash: BigNumberish;
-  rightHash: BigNumberish;
-}
-
-interface EdgeProof {
-  childHash: BigNumberish;
-  path: BigNumberish;
-  length: BigNumberish;
-}
-
-interface StarknetProof {
-  nodeType: BigNumberish;
-  binaryProof: BinaryProof;
-  edgeProof: EdgeProof;
-}
-
-interface StarknetContractData {
-  contractStateRoot: BigNumberish;
-  contractAddress: BigNumberish;
-  storageVarAddress: BigNumberish;
-  classHash: BigNumberish;
-  hashVersion: BigNumberish;
-  nonce: BigNumberish;
-}
 
 interface IVerificationResult {
   type: "success" | "error";
@@ -81,8 +57,8 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
   ];
 
   // const [starknetStateRoot, setStarknetStateRoot] = useState('');
-  const [storageProof, setStorageProof] = useState([]);
-  const [contractProof, setContractProof] = useState([]);
+  const [storageProof, setStorageProof] = useState<StarknetProof[]>([]);
+  const [contractProof, setContractProof] = useState<StarknetProof[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
   // const [blockNumber, setBlockNumber] = useState<string>();
@@ -100,10 +76,10 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
       starknetCommitmentBlockNumber,
       contractData,
       contractProof,
-      storageProof[0],
+      storageProof,
     ],
     overrides: { blockTag: parseInt(ethereumBlockNumber!) },
-    enabled: !!proof?.contract_data && !!contractData,
+    enabled: !!proof?.contractData && !!contractData,
     onError: (error: Error) => {
       console.log(error);
       setVerificationResult({
@@ -141,66 +117,10 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
     },
   });
 
-  function parseProofElement(element: any): StarknetProof {
-    console.log(element);
-    if (element.binary != undefined) {
-      return {
-        nodeType: 0,
-        binaryProof: {
-          leftHash: element.binary.left,
-          rightHash: element.binary.right,
-        },
-        edgeProof: {
-          childHash: 0,
-          path: 0,
-          length: 0,
-        },
-      };
-    } else if (element.edge != undefined) {
-      return {
-        nodeType: 1,
-        binaryProof: {
-          leftHash: 0,
-          rightHash: 0,
-        },
-        edgeProof: {
-          childHash: element.edge.child,
-          path: element.edge.path.value,
-          length: element.edge.path.len,
-        },
-      };
-    } else {
-      throw new Error("Invalid proof element");
-    }
-  }
 
   useEffect(() => {
     /// parse proof JSON
     console.log(!proof?.contract_data);
-    if (!proof?.contract_data) return;
-
-    let myContractProofs: any = [];
-    let myStorageproofs: any = [];
-    proof.contract_proof.forEach((element: any) => {
-      myContractProofs.push(parseProofElement(element));
-    });
-
-    if (proof.contract_data?.storage_proofs) {
-      proof.contract_data?.storage_proofs.forEach((storage_proof: any) => {
-        let myStorageProof: any = [];
-        storage_proof.forEach((element: any) => {
-          myStorageProof.push(parseProofElement(element));
-        });
-        myStorageproofs.push(myStorageProof);
-      });
-    }
-
-    setContractProof(myContractProofs);
-    setStorageProof(myStorageproofs);
-  }, [proof]);
-
-  // recompute contract data used with the contractRead hook
-  useEffect(() => {
     if (!proof?.contract_data) {
       toast({
         title: "Contract doesn't Exists!!",
@@ -213,16 +133,13 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
       return;
     }
 
-    const _contractData: StarknetContractData = {
-      contractStateRoot: proof.contract_data?.root || "0x0",
-      contractAddress: contractAddress!,
-      storageVarAddress: storageAddress!,
-      classHash: proof.contract_data?.class_hash || "0x0",
-      hashVersion: proof.contract_data?.contract_state_hash_version || "0x0",
-      nonce: proof.contract_data?.nonce || "0x0",
-    };
-    setContractData(_contractData);
+    let parsedProof: StarknetCompositeStateProof = parseStarknetProof(proof, contractAddress, storageAddress, starknetCommitmentBlockNumber);
+
+    setContractProof(parsedProof.contractProofArray);
+    setStorageProof(parsedProof.storageProofArray);
+    setContractData(parsedProof.contractData);
   }, [proof]);
+
 
   // refetch contractRead hook
   useEffect(() => {

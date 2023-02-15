@@ -1,11 +1,5 @@
 import jsonRpcCall from "./RpcCall";
-
-// const jsonRpcCall = require('./RpcCall');
-//import { hash, number } from "starknet";
 import { BigNumberish } from "ethers";
-
-// import IStarknetResolver from './IStarknetResolverService.json'
-// import StarknetoreContract from './StarknetCoreContract.json'
 
 export interface BinaryProof {
   leftHash: BigNumberish;
@@ -41,7 +35,6 @@ export interface StarknetCompositeStateProof {
 }
 
 function parseProofElement(element: any): StarknetProof {
-  // console.log(element)
   if (element.binary != undefined) {
     return {
       nodeType: 0,
@@ -130,6 +123,25 @@ export function parseStarknetProof(response: any, contractAddress: BigNumberish,
   return myCompositeStateProof;
 }
 
+export async function getStarknetProofJson(rpc_url: string, contractAddress: BigNumberish, storageVarAddress: BigNumberish, starknetCommittedBlockNumber: BigNumberish): Promise<any> {
+  try {
+    let blockArg = { 'block_number': parseInt(starknetCommittedBlockNumber.toString()) }
+    const args = [
+      blockArg,
+      contractAddress,
+      [storageVarAddress]
+    ];
+
+    const result = await jsonRpcCall(rpc_url, "pathfinder_getProof", args);
+    return result;
+  }
+  catch (error) {
+    console.log('error', error)
+    throw error
+  }
+}
+
+
 export async function getStarknetProof(rpc_url: string, contractAddress: BigNumberish, storageVarAddress: BigNumberish, starknetCommittedBlockNumber: BigNumberish): Promise<StarknetCompositeStateProof> {
   try {
     let blockArg = { 'block_number': parseInt(starknetCommittedBlockNumber.toString()) }
@@ -140,7 +152,6 @@ export async function getStarknetProof(rpc_url: string, contractAddress: BigNumb
     ];
 
     const result = await jsonRpcCall(rpc_url, "pathfinder_getProof", args);
-    console.log('result', JSON.stringify(result))
     return parseStarknetProof(result, contractAddress, storageVarAddress, starknetCommittedBlockNumber);
   }
   catch (error) {
