@@ -11,6 +11,7 @@ from starkware.starknet.compiler.compile import compile_starknet_files, get_sele
 from starkware.cairo.lang.vm.crypto import pedersen_hash
 from starkware.starknet.public.abi import get_selector_from_name, get_storage_var_address, starknet_keccak
 
+#ROUGH TEST AREA, NOT PART OF THE PROJECT TESTS. USED FOR VERIFICATION, DEBUGGING AGAINST EXISTING PYTHON IMPLEMENTATION
 
 print("initializer ", get_storage_var_address('resolver'))
 # print("pedersen_hash ", hex(pedersen_hash(
