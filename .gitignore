@@ -4,6 +4,7 @@ coverage
 coverage.json
 typechain
 .openzeppelin
+tsconfig.tsbuildinfo
 
 #Hardhat files
 cache
@@ -14,6 +15,7 @@ frontend/node_modules
 frontend/.env
 
 frontend/dist
+pathfinder_getproof_lib/dist
 
 #IDE
 .idea

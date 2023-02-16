@@ -24,7 +24,8 @@ import { useAccount, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { EnsProofCardState, EnsProofCardStateKeys } from "./EnsProofCard";
 import { CheckCircleIcon } from "@chakra-ui/icons";
-import { STARKNET_CORE_CONTRACT_ADDRESS } from "../../constants";
+import { PATHFINDER_RPC_URL, STARKNET_CORE_CONTRACT_ADDRESS } from "../../constants";
+import { getStarknetProofJson } from "pathfinder_getproof_lib";
 
 interface Props {
   state: EnsProofCardState;
@@ -147,30 +148,14 @@ const GetProofForm: React.FC<Props> = ({
   // This calls as per interval timer
   useEffect(() => {
     const id = setInterval(timer, 10000);
-
     return () => clearInterval(id);
   }, [coreContractRootState]);
 
 
-  const { connector: activeConnector, isConnected } = useAccount();
-
-  const { connect, connectors, error, pendingConnector } = useConnect({
-    connector: new InjectedConnector(),
-  });
-
   // Handle the form submission
   const handleSubmit = async () => {
-    // Not necessary to connect.
-    // if (!isConnected) {
-    //   connect();
-    // }
-
-    // const formData = new FormData(event.currentTarget);
     const contractAddress = state.contractAddress;
-    const storageAddress = state.storageAddress;
-    // setStarknetCoreContractAddress(formData.get('corecontract-address') as string);
-    // setStorageAddress(storageAddress);
-    // setContractAddress(contractAddress);
+    const storageAddress = state.storageAddress ? state.storageAddress : "";
 
     if (!contractAddress?.trim()) {
       toast({
@@ -199,7 +184,7 @@ const GetProofForm: React.FC<Props> = ({
     console.log(args);
     // Call the JSON-RPC method with the given params
     // and pass the result to the onResult callback
-    const result = await jsonRpcCall("pathfinder_getProof", args);
+    const result = await getStarknetProofJson(PATHFINDER_RPC_URL, contractAddress, storageAddress, committedBlockNumber)
     console.log({ result });
 
     setState({

@@ -1,17 +1,17 @@
 {
-  "version": "0.2.1",
+  "version": "0.0.3",
   "license": "MIT",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node  dist/index.js",
+    "start": "node dist/index.js",
     "build": "tsdx build",
     "gcp-build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "tsdx build",
+    "prepare": "NODE_ENV=development tsdx build",
     "clean": "rm -fr node_modules dist"
   },
   "husky": {
@@ -25,22 +25,15 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "sn-resolver-gateway",
-  "author": "Fawad Haider",
+  "name": "pathfinder_getproof_lib",
+  "author": "fawad haider",
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.5.5",
     "@types/node": "^16.3.3",
-    "esbuild-kit": "^0.0.3",
-    "eslint-import-resolver-typescript": "^3.5.3",
-    "eslint-plugin-import": "^2.27.5",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@chainlink/ccip-read-server": "^0.2.1",
-    "eth-ens-namehash": "^2.0.8",
     "ethers": "^5.0.25",
-    "pathfinder_getproof_lib": "^0.0.3",
     "starknet": "^4.17.1",
     "tsdx": "^0.14.1"
   }

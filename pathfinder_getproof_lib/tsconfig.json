@@ -5,13 +5,12 @@
     "types"
   ],
   "compilerOptions": {
-    // "module": "esnext",
-    "target": "es5", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', or 'ESNEXT'. */
-    "module": "ESNext", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     "lib": [
       "dom",
       "esnext"
     ],
+    /* Truncated compiler options to list only relevant options */
+    "declarationMap": true,
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,
@@ -39,13 +38,11 @@
     "forceConsistentCasingInFileNames": true,
     // `tsdx build` ignores this option, but it is commonly used when type-checking separately with `tsc`
     "resolveJsonModule": true,
+    "composite": true,
     "outDir": "dist",
+    "target": "es5", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', or 'ESNEXT'. */
+    "module": "esnext", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
   },
-  // "references": [
-  //   {
-  //     "path": "../shared_lib"
-  //   }
-  // ],
   "exclude": [
     "node_modules",
     "dist",
