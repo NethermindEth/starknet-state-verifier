@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ethers, BigNumber, BigNumberish } from 'ethers';
 import 'isomorphic-fetch';
-import StarknetVerifier from './StarknetVerifier.json'
+import StarknetVerifier from './SNResolverStub.json'
 const namehash = require('eth-ens-namehash');
 const program = new Command();
 const { defaultAbiCoder, hexConcat } = require("ethers/lib/utils");

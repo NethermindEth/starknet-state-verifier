@@ -55,17 +55,67 @@ task('copy-abi', 'Copies the ABI file to the destination folder').setAction(asyn
   // Check if the ABI file exists
   // Define the path to the ABI file
   console.log("Copying ABI file");
-  const abiSourceFilePath = './artifacts/contracts/SNResolverStub.sol/SNResolverStub.json';
+  const abiSourceL1ResolverPath = './artifacts/contracts/SNResolverStub.sol/SNResolverStub.json';
+  const abiSourceCoreContractPath = './artifacts/contracts/SNStateProofVerifier.sol/StarknetCoreContract.json';
+  const abiSourceResolverService = './artifacts/contracts/SNStateProofVerifier.sol/IStarknetResolverService.json';
 
-  // Define the destination folder for the ABI file
-  const abiDestinationFilePath = './frontend/src/abi/SNResolverStub.json';
+  // Define the destination for front end
+  const abiL1ResolverDestinationFrontEnd = '../frontend/src/abi/SNResolverStub.json';
+  const abiCoreContractDestinationFrontEnd = '../frontend/src/abi/StarknetCoreContract.json';
 
-  // File "destination.txt" will be created or overwritten by default.
-  fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
+  // Define the destination for gateway
+  const abiL1ResolverDestinationGateway = '../gateway/src/SNResolverStub.json';
+  const abiCoreContractDestinationGateway = '../gateway/src/StarknetCoreContract.json';
+  const abiResolverServiceDestinationGateway = '../gateway/src/IStarknetResolverService.json';
+
+  // Define the destination for testclient
+  const abiL1ResolverDestinationTestClient = '../testclient/src/SNResolverStub.json';
+  const abiResolverServiceDestinationTestClient = '../testclient/src/IStarknetResolverService.json';
+
+  // front end
+  fs.copyFile(abiSourceL1ResolverPath, abiL1ResolverDestinationFrontEnd, (err) => {
     if (err)
       throw err;
-    console.log(`ABI file copied to ${abiDestinationFilePath}`);
+    console.log(`ABI file copied to ${abiL1ResolverDestinationFrontEnd}`);
   });
+  fs.copyFile(abiSourceCoreContractPath, abiCoreContractDestinationFrontEnd, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiCoreContractDestinationFrontEnd}`);
+  });
+
+  // gateway
+  fs.copyFile(abiSourceL1ResolverPath, abiL1ResolverDestinationGateway, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiL1ResolverDestinationGateway}`);
+  });
+  fs.copyFile(abiSourceCoreContractPath, abiCoreContractDestinationGateway, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiCoreContractDestinationGateway}`);
+  });
+  fs.copyFile(abiSourceResolverService, abiResolverServiceDestinationGateway, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiResolverServiceDestinationGateway}`);
+  });
+
+  // test client
+  fs.copyFile(abiSourceL1ResolverPath, abiL1ResolverDestinationTestClient, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiL1ResolverDestinationTestClient}`);
+  });
+  fs.copyFile(abiSourceResolverService, abiResolverServiceDestinationTestClient, (err) => {
+    if (err)
+      throw err;
+    console.log(`ABI file copied to ${abiResolverServiceDestinationTestClient}`);
+  });
+
+
+
+
 });
 
 

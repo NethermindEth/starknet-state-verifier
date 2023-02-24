@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "IStarknetResolverService",
-  "sourceName": "contracts/StarknetVerifier.sol",
+  "sourceName": "contracts/SNStateProofVerifier.sol",
   "abi": [
     {
       "inputs": [
