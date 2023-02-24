@@ -55,10 +55,10 @@ task('copy-abi', 'Copies the ABI file to the destination folder').setAction(asyn
   // Check if the ABI file exists
   // Define the path to the ABI file
   console.log("Copying ABI file");
-  const abiSourceFilePath = './artifacts/contracts/StarknetVerifier.sol/StarknetVerifier.json';
+  const abiSourceFilePath = './artifacts/contracts/SNResolverStub.sol/SNResolverStub.json';
 
   // Define the destination folder for the ABI file
-  const abiDestinationFilePath = './frontend/src/abi/StarknetVerifier.json';
+  const abiDestinationFilePath = './frontend/src/abi/SNResolverStub.json';
 
   // File "destination.txt" will be created or overwritten by default.
   fs.copyFile(abiSourceFilePath, abiDestinationFilePath, (err) => {
