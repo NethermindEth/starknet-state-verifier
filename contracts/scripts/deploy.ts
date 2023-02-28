@@ -33,7 +33,7 @@ const deployTables = async () => {
 
 const deployAll = async () => {
   let pedersenHash: any;
-  let proofverifier: any;
+  let l1resolverStub: any; // this is also the verifier
   let starknetCoreContractStub: any;
 
   const [deployer] = await ethers.getSigners();
@@ -42,27 +42,27 @@ const deployAll = async () => {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   try {
-    const StarknetVerifier = await ethers.getContractFactory(
-      "StarknetVerifier"
+    const SNResolverStub = await ethers.getContractFactory(
+      "SNResolverStub"
     );
     const network = await ethers.provider.getNetwork();
 
     console.log("Network: ", network.name);
     if (network.name == "goerli") {
       console.log("Deploying to Goerli");
-      // proofverifier = await StarknetVerifier.deploy('0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1', '0xde29d060D45901Fb19ED6C6e959EB22d8626708e');
-      // proofverifier = await StarknetVerifier.deploy();
       const proofProxy = await upgrades.deployProxy(
-        StarknetVerifier,
+        SNResolverStub,
         [
           "0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1",
           "0xde29d060D45901Fb19ED6C6e959EB22d8626708e",
           ["https://starknetens.ue.r.appspot.com/{sender}/{data}.json"], // per https://eips.ethereum.org/EIPS/eip-3668  the sender and data populated by the client library like ethers.js with data returned by the CCIP enabled contract via revert
           '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'
         ],
-        { deployer }
+        {
+          initializer: "initialize(address,address,string[],uint256)"
+        }
       );
-      proofverifier = await proofProxy.deployed();
+      l1resolverStub = await proofProxy.deployed();
     } else if (network.name == "mainnet") {
       console.log("Deploying to Mainnet");
       // TODO: Add mainnet address
@@ -96,16 +96,18 @@ const deployAll = async () => {
       );
 
       const proofProxy = await upgrades.deployProxy(
-        StarknetVerifier,
+        SNResolverStub,
         [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
-        { deployer }
+        {
+          initializer: "initialize(address,address,string[],uint256)"
+        }
       );
-      proofverifier = await proofProxy.deployed();
+      l1resolverStub = await proofProxy.deployed();
     }
 
     console.log(
-      "Verifier contract has been deployed to: ",
-      proofverifier.address
+      "Verifier/l1resolver contract has been deployed to: ",
+      l1resolverStub.address
     );
   } catch (e) {
     console.log(e);

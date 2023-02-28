@@ -36,7 +36,7 @@ const deployTables = async () => {
 
 describe("Verify", function () {
   let pedersenHash: any;
-  let proofverifier: any;
+  let l1resolverStub: any;
   let starknetCoreContractStub: any;
   let accounts: SignerWithAddress[];
 
@@ -59,7 +59,7 @@ describe("Verify", function () {
     var compositeProof: StarknetCompositeStateProof = parseStarknetProof(originalParse.result, contractAddress, storageVarAddress, coreContractBlockNumber);
 
     console.log("Core contract block number: " + coreContractBlockNumber);
-    const result = await proofverifier.verifiedStorageValue(
+    const result = await l1resolverStub.verifiedStorageValue(
       coreContractBlockNumber,
       compositeProof.contractData,
       compositeProof.contractProofArray,
@@ -95,21 +95,24 @@ describe("Verify", function () {
         starknetCoreContractStub.address
       );
 
-      const StarknetVerifier = await ethers.getContractFactory(
-        "StarknetVerifier"
+      const SNResolverStub = await ethers.getContractFactory(
+        "SNResolverStub"
       );
 
       const proofProxy = await upgrades.deployProxy(
-        StarknetVerifier,
+        SNResolverStub,
         [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:9545/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
-        { kind: "uups" }
+        {
+          kind: "uups",
+          initializer: "initialize(address,address,string[],uint256)"
+        }
       );
-      proofverifier = await proofProxy.deployed();
+      l1resolverStub = await proofProxy.deployed();
 
-      await proofverifier.deployed();
+      await l1resolverStub.deployed();
       console.log(
-        "Verifier contract has been deployed to: ",
-        proofverifier.address
+        "Verifier/l1resolver contract has been deployed to: ",
+        l1resolverStub.address
       );
     } catch (e) {
       console.log(e);
@@ -127,7 +130,7 @@ describe("Verify", function () {
     );
 
     const result = await pedersenHash.hash(input);
-    const resultFromStarknetVerifier: BigNumber = await proofverifier.hash(a, b);
+    const resultFromStarknetVerifier: BigNumber = await l1resolverStub.hash(a, b);
     expect(resultFromStarknetVerifier.toString()).to.be.eq(result[0]);
   });
 

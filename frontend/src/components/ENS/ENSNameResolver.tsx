@@ -20,7 +20,7 @@ import { namehash } from "ethers/lib/utils.js";
 import { BigNumber, Contract, ethers } from "ethers";
 import { CopyIcon } from "@chakra-ui/icons";
 import { useContract, useEnsResolver, useProvider } from "wagmi";
-import resolverAbi from "../../abi/StarknetVerifier.json";
+import resolverAbi from "../../abi/SNResolverStub.json";
 import StarknetContractInteraction from "../Starknet/ContractInteraction";
 
 interface INameResolver {

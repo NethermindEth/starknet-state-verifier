@@ -16,7 +16,7 @@ import {
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
-import StarknetVerifier from "../../abi/StarknetVerifier.json";
+import StarknetVerifier from "../../abi/SNResolverStub.json";
 import { Spinner } from "@chakra-ui/react";
 
 import { EnsProofCardState } from "./EnsProofCard";
