@@ -43,7 +43,7 @@ server.add(IStarknetResolver.abi, [
   {
     type: 'addr(bytes32)',
     func: async ([node]: any, { to, data: _callData }) => {
-      let myCompositeStateProof: StarknetCompositeStateProof = { blockNumber: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
+      let myCompositeStateProof: StarknetCompositeStateProof = { blockNumber: 0, classCommitment: 0, contractData: { contractStateRoot: 0, contractAddress: 0, storageVarAddress: 0, classHash: 0, hashVersion: 0, nonce: 0 }, contractProofArray: [], storageProofArray: [] }
       try {
         console.log(1, { node, to, _callData, l1_provider_url, l2_resolver_address })
         const blockNumber = (await l1_provider.getBlock('latest')).number

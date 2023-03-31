@@ -24,7 +24,7 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         bytes extraData
     );
 
-    uint256 constant MASK_250 = (2**250) - 1; // to simulate sn_keccak
+    uint256 constant MASK_250 = (2 ** 250) - 1; // to simulate sn_keccak
     uint256 constant storageVarName =
         0x29539a1d23af1810c48a07fe7fc66a3b34fbc8b37e9b3cdb97bb88ceab7e4bf; // sn_keccak of 'resolver' in https://github.com/starknet-id/ens_resolver/blob/3577d3bf3e309614dbec16aca56b7cade2bac949/src/main.cairo#L7
 
@@ -35,12 +35,14 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
 
     function initialize(
         address pedersenAddress,
+        address poseidonAddress,
         address _starknetCoreContractAddress,
         string[] memory _gateways,
         uint256 _l2resolver
     ) public initializer {
         SNStateProofVerifier.initialize(
             pedersenAddress,
+            poseidonAddress,
             _starknetCoreContractAddress
         );
         gateways = _gateways;
@@ -55,11 +57,9 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
     }
 
     // returns the address of the storage within the starknet l2 resolver contract
-    function calculateDomainStorageVarAddressFor(uint256 domain)
-        internal
-        view
-        returns (uint256)
-    {
+    function calculateDomainStorageVarAddressFor(
+        uint256 domain
+    ) internal view returns (uint256) {
         return hash(storageVarName, domain);
     }
 
@@ -70,11 +70,10 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
             );
     }
 
-    function addr(bytes32 node, uint256 coinType)
-        public
-        view
-        returns (bytes memory)
-    {
+    function addr(
+        bytes32 node,
+        uint256 coinType
+    ) public view returns (bytes memory) {
         if (coinType == 60) {
             // replicated logic to demonstrate CCIP reslution on the ens app, as starknet address will not resolve so we are just resolving eth address.
             // 60 for eth address
@@ -93,11 +92,10 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         }
     }
 
-    function _addr(bytes32 node, bytes4 selector)
-        private
-        view
-        returns (uint256)
-    {
+    function _addr(
+        bytes32 node,
+        bytes4 selector
+    ) private view returns (uint256) {
         uint256 starknetNode = uint256(node) & MASK_250;
 
         bytes memory callData = abi.encodeWithSelector(
@@ -128,11 +126,10 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         return uint256ToBytes(_addrWithProof(response, extraData));
     }
 
-    function _addrWithProof(bytes calldata response, bytes calldata extraData)
-        internal
-        view
-        returns (uint256)
-    {
+    function _addrWithProof(
+        bytes calldata response,
+        bytes calldata extraData
+    ) internal view returns (uint256) {
         StarknetCompositeStateProof memory proof = abi.decode(
             response,
             (StarknetCompositeStateProof)
@@ -147,6 +144,7 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         proof.contractData.storageVarAddress = storageVarAdress;
         uint256 starknetAddress = this.verifiedStorageValue(
             proof.blockNumber,
+            proof.classCommitment,
             proof.contractData,
             proof.contractProofArray,
             proof.storageProofArray
@@ -155,12 +153,9 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         return starknetAddress;
     }
 
-    function supportsInterface(bytes4 interfaceID)
-        public
-        pure
-        override
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceID
+    ) public pure override returns (bool) {
         return
             interfaceID == ADDR_INTERFACE_ID ||
             interfaceID == ADDRESS_INTERFACE_ID;
@@ -180,9 +175,7 @@ contract SNResolverStub is SNStateProofVerifier, ERC165 {
         }
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 }

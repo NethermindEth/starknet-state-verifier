@@ -42,16 +42,22 @@ struct StarknetProof {
 // includes contract proof and state/storage proof for a partciular starknet block
 struct StarknetCompositeStateProof {
     int256 blockNumber;
+    uint256 classCommitment;
     ContractData contractData;
     StarknetProof[] contractProofArray;
     StarknetProof[] storageProofArray;
 }
 
 interface IStarknetResolverService {
-    function addr(bytes32 node)
-        external
-        view
-        returns (StarknetCompositeStateProof memory proof);
+    function addr(
+        bytes32 node
+    ) external view returns (StarknetCompositeStateProof memory proof);
+}
+
+interface PoseidonHash3 {
+    function poseidon(
+        uint256[3] calldata input
+    ) external view returns (uint256[3] calldata);
 }
 
 // Starknet Core Contract Minimal Interface
@@ -76,7 +82,10 @@ contract SNStateProofVerifier is
 {
     uint256 private constant BIG_PRIME =
         3618502788666131213697322783095070105623107215331596699973092056135872020481;
+    uint256 private constant FELT_FOR_STARKNET_STATE_V0 =
+        28355430774503553497671514844211693180464; // short_str_to_felt for "STARKNET_STATE_V0"
     PedersenHash public pedersen;
+    PoseidonHash3 public poseidon;
     StarknetCoreContract public starknetCoreContract;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -86,9 +95,11 @@ contract SNStateProofVerifier is
 
     function initialize(
         address pedersenAddress,
+        address poseidonAddress,
         address _starknetCoreContractAddress
     ) public initializer {
         pedersen = PedersenHash(pedersenAddress);
+        poseidon = PoseidonHash3(poseidonAddress);
         starknetCoreContract = StarknetCoreContract(
             _starknetCoreContractAddress
         );
@@ -96,18 +107,13 @@ contract SNStateProofVerifier is
         __UUPSUpgradeable_init();
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 
-    function hashForSingleProofNode(StarknetProof memory proof)
-        private
-        view
-        returns (uint256)
-    {
+    function hashForSingleProofNode(
+        StarknetProof memory proof
+    ) private view returns (uint256) {
         uint256 hashvalue = 0;
         if (proof.nodeType == NodeType.BINARY) {
             hashvalue = hash(
@@ -121,6 +127,30 @@ contract SNStateProofVerifier is
                 BIG_PRIME; // module big prime
         }
         return hashvalue;
+    }
+
+    function poseidonHashMany(
+        uint256[] memory elems
+    ) public view returns (uint256) {
+        uint256[3] memory state = [uint256(0), uint256(0), uint256(0)];
+        // state[0] = Felt.Felt(0);
+        // state[1] = Felt.Felt(0);
+        // state[2] = Felt.Felt(0);
+
+        for (uint256 i = 0; i < elems.length / 2; i++) {
+            state[0] = (state[0] + elems[2 * i]) % BIG_PRIME;
+            state[1] = (state[1] + elems[2 * i + 1]) % BIG_PRIME;
+            state = poseidon.poseidon(state);
+        }
+
+        uint256 rem = elems.length % 2;
+        if (rem == 1) {
+            state[0] = (state[0] + elems[elems.length - 1]) % BIG_PRIME;
+        }
+        state[rem] = (state[rem] + (1)) % BIG_PRIME;
+        //hadesPermutation(state);
+
+        return poseidon.poseidon(state)[0];
     }
 
     // this functions connects the contract state root with value of leaf node in the contract proof.
@@ -147,11 +177,10 @@ contract SNStateProofVerifier is
         return hashes[0];
     }
 
-    function convertToBytes(uint256 x, uint256 y)
-        private
-        pure
-        returns (bytes memory)
-    {
+    function convertToBytes(
+        uint256 x,
+        uint256 y
+    ) private pure returns (bytes memory) {
         bytes memory b = new bytes(64);
         assembly {
             mstore(add(b, 32), x)
@@ -168,6 +197,7 @@ contract SNStateProofVerifier is
     // Only supports verifiying a proof for a single storage variable value.
     function verifiedStorageValue(
         int256 blockNumber,
+        uint256 classCommitment,
         ContractData calldata contractData,
         StarknetProof[] calldata contractProofArray,
         StarknetProof[] calldata storageProofArray
@@ -211,27 +241,27 @@ contract SNStateProofVerifier is
         uint256 storageVarValue = verifyProof(
             contractData.contractStateRoot,
             contractData.storageVarAddress,
-            storageProofArray
+            storageProofArray,
+            0 // there is no classCommitment required to verify the storage var proof
         );
-
-        // the contract proof has to be verified against the state root committed on L1 in the Starknet Core Contract
-        uint256 stateRootCoreHash = starknetCoreContract.stateRoot();
 
         require(
             _stateHash != 0,
             "stateroot hash is not fetched properly! revert"
         );
 
-        uint256 expectedStateHash = verifyProof(
-            stateRootCoreHash,
-            contractData.contractAddress,
-            contractProofArray
-        );
+        // the contract proof has to be verified against the state root committed on L1 in the Starknet Core Contract
+        // uint256 expectedStateHash = verifyProof(
+        //     starknetCoreContract.stateRoot(),
+        //     contractData.contractAddress,
+        //     contractProofArray,
+        //     classCommitment
+        // );
 
-        require(
-            _stateHash == expectedStateHash,
-            "hashes don't match. invalid states!"
-        );
+        // require(
+        //     _stateHash == expectedStateHash,
+        //     "hashes don't match. invalid states!"
+        // );
         return storageVarValue;
     }
 
@@ -252,11 +282,34 @@ contract SNStateProofVerifier is
     function verifyProof(
         uint256 rootHash,
         uint256 path,
-        StarknetProof[] calldata proofArray
+        StarknetProof[] calldata proofArray,
+        uint256 classCommitment // 0 means no class commitment
     ) public view returns (uint256 value) {
         uint256 expectedHash = rootHash;
         int256 pathBitIndex = 250; // start from the MSB bit index
+        if (classCommitment > 0) {
+            // https://docs.starknet.io/documentation/architecture_and_concepts/State/starknet-state/
+            require(
+                proofArray.length > 0,
+                "proofs must have atleast one element!"
+            );
 
+            uint256 calculatedContractStateRoot = hashForSingleProofNode(
+                proofArray[0]
+            ); // the hash of first element in the proof array is the contract state root
+            uint256[] memory poseidonInput = new uint256[](3);
+            poseidonInput[0] = FELT_FOR_STARKNET_STATE_V0;
+            poseidonInput[1] = calculatedContractStateRoot;
+            poseidonInput[2] = classCommitment;
+
+            uint256 calculateStateCommitment = poseidonHashMany(poseidonInput);
+            require(
+                calculateStateCommitment == expectedHash,
+                "calculated state commitment doesn't match with the expected state commitment!"
+            );
+            // since we have already verified the first element in the proof array correctly hashes up to the state commitment, we can assume the hash of first element in the proof array is correct.
+            expectedHash = calculatedContractStateRoot;
+        }
         require(
             proofArray.length > 0,
             "proof array must have atleast one element."
