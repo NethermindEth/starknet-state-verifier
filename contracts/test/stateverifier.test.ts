@@ -175,36 +175,37 @@ describe("Verify", function () {
     expect(result).to.equal(expectedStorageVarValue);
   });
 
-  // it("it should verify the sampleproof2.json", async function () {
-  //   var jsonFile = "./sampleProof2.json";
-  //   const contractAddress =
-  //     "0x048a64f708011fb5089778204f37d6111bd9bbac0fe4b6e7851292b8cbeeb6ef";
-  //   const storageVarAddress =
-  //     "0x3284999a2939a8b54b2831813deb324170904a9a5145470eca917d66eb69708";
-  //   const expectedStorageVarValue =
-  //     "0x1C62C52C1709ACB3EB9195594E39C04323658463CFE0C641E39B99A83BA11A1";
-  //   var result = await getVerifiedStorageValue(
-  //     contractAddress,
-  //     storageVarAddress,
-  //     jsonFile
-  //   );
-  //   console.log("Result: " + result);
-  //   expect(result).to.equal(expectedStorageVarValue);
-  // });
+  it("it should verify the sampleproof2.json", async function () {
+    //ETH ERC20 contract proof
+    var jsonFile = "./sampleProof2.json";
+    const contractAddress =
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
+    const storageVarAddress =
+      "0x5b591ebdce191ad38e7c15ddf7b7913c3756c431f6e6e684e87c1f87023a0fe";
+    const expectedStorageVarValue =
+      "167316537742136665";
+    var result = await getVerifiedStorageValue(
+      contractAddress,
+      storageVarAddress,
+      jsonFile
+    );
+    console.log("Result: " + result);
+    expect(result).to.equal(expectedStorageVarValue);
+  });
 
-  // it("it should verify the sampleproof3.json", async function () {
-  //   var jsonFile = "./sampleProof3.json";
-  //   const contractAddress =
-  //     "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
-  //   const storageVarAddress =
-  //     "0x5b591ebdce191ad38e7c15ddf7b7913c3756c431f6e6e684e87c1f87023a0fe";
-  //   const expectedStorageVarValue = "0xfc0d9ddcd6892";
-  //   var result = await getVerifiedStorageValue(
-  //     contractAddress,
-  //     storageVarAddress,
-  //     jsonFile
-  //   );
-  //   console.log("Result: " + result);
-  //   expect(result).to.equal(expectedStorageVarValue);
-  // });
+  it("it should verify the sampleproof3.json", async function () {
+    var jsonFile = "./sampleProof3.json";
+    const contractAddress =
+      "0x000684167f946c40e4fe022e8af0bd6d17a18b04d0a0bed7826fecb891648222";
+    const storageVarAddress =
+      "0x778220fed180f06f58a2d1b21e63a28f5ff0703186c7a8c742fb64e85f98ab3";
+    const expectedStorageVarValue = "2024";
+    var result = await getVerifiedStorageValue(
+      contractAddress,
+      storageVarAddress,
+      jsonFile
+    );
+    console.log("Result: " + result);
+    expect(result).to.equal(expectedStorageVarValue);
+  });
 });
