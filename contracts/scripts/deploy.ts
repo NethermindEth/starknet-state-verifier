@@ -42,6 +42,42 @@ const deployAll = async () => {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   try {
+    //////////POSEIDON DEPLOYMENT
+    // const generatedPath = path.join(__dirname, "..", "generated");
+    // const poseidonBytecodePath = path.join(generatedPath, `poseidon.bytecode`);
+    // const poseidonBytecode = fs.readFileSync(poseidonBytecodePath);
+    // const poseidonAbiPath = path.join(generatedPath, `poseidon.abi`);
+    // const poseidonAbi = fs.readFileSync(poseidonAbiPath);
+    // const Poseidon3 = new ethers.ContractFactory(
+    //   poseidonAbi.toString(),
+    //   poseidonBytecode.toString(),
+    //   deployer
+    // );
+
+
+    // const gasPrice = await Poseidon3.signer.getGasPrice();
+    // console.log(`Current gas price: ${gasPrice}`);
+
+    // const estimatedGas = await Poseidon3.signer.estimateGas(
+    //   Poseidon3.getDeployTransaction(),
+    // );
+    // console.log(`Estimated gas: ${estimatedGas}`);
+    // const deploymentPrice = gasPrice.mul(estimatedGas);
+    // const deployerBalance = await Poseidon3.signer.getBalance();
+    // console.log(`Deployer balance:  ${ethers.utils.formatEther(deployerBalance)}`);
+    // console.log(`Deployment price:  ${ethers.utils.formatEther(deploymentPrice)}`);
+    // if (deployerBalance.lt(deploymentPrice)) {
+    //   throw new Error(
+    //     `Insufficient funds. Top up your account balance by ${ethers.utils.formatEther(
+    //       deploymentPrice.sub(deployerBalance),
+    //     )}`,
+    //   );
+    // }
+
+    // const poseidon3 = await Poseidon3.deploy();
+    // await poseidon3.deployed();
+    // console.log("Poseidon3 contract has been deployed to: ", poseidon3.address);
+
     const SNResolverStub = await ethers.getContractFactory(
       "SNResolverStub"
     );
@@ -49,17 +85,37 @@ const deployAll = async () => {
 
     console.log("Network: ", network.name);
     if (network.name == "goerli") {
+      const gasPrice = await SNResolverStub.signer.getGasPrice();
+      console.log(`Current gas price: ${gasPrice}`);
+
+      const estimatedGas = await SNResolverStub.signer.estimateGas(
+        SNResolverStub.getDeployTransaction(),
+      );
+      console.log(`Estimated gas: ${estimatedGas}`);
+      const deploymentPrice = gasPrice.mul(estimatedGas);
+      const deployerBalance = await SNResolverStub.signer.getBalance();
+      console.log(`Deployer balance:  ${ethers.utils.formatEther(deployerBalance)}`);
+      console.log(`Deployment price:  ${ethers.utils.formatEther(deploymentPrice)}`);
+      if (deployerBalance.lt(deploymentPrice)) {
+        throw new Error(
+          `Insufficient funds. Top up your account balance by ${ethers.utils.formatEther(
+            deploymentPrice.sub(deployerBalance),
+          )}`,
+        );
+      }
+
       console.log("Deploying to Goerli");
       const proofProxy = await upgrades.deployProxy(
         SNResolverStub,
         [
           "0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1",
+          "0x84d43a8cbEbF4F43863f399c34c06fC109c957a4", // poseidon already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
           "0xde29d060D45901Fb19ED6C6e959EB22d8626708e",
           ["https://starknetens.ue.r.appspot.com/{sender}/{data}.json"], // per https://eips.ethereum.org/EIPS/eip-3668  the sender and data populated by the client library like ethers.js with data returned by the CCIP enabled contract via revert
           '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'
         ],
         {
-          initializer: "initialize(address,address,string[],uint256)"
+          initializer: "initialize(address,address,address,string[],uint256)"
         }
       );
       l1resolverStub = await proofProxy.deployed();
@@ -84,6 +140,7 @@ const deployAll = async () => {
         pedersenHash.address
       );
 
+      // TEST STUB FOR LOCAL TESTING
       const StarknetCoreContractStub = await ethers.getContractFactory(
         "StarknetCoreContractStub"
       );
@@ -97,9 +154,10 @@ const deployAll = async () => {
 
       const proofProxy = await upgrades.deployProxy(
         SNResolverStub,
-        [pedersenHash.address, starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
+        [pedersenHash.address, poseidon3.address
+          , starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
         {
-          initializer: "initialize(address,address,string[],uint256)"
+          initializer: "initialize(address,address,address,string[],uint256)"
         }
       );
       l1resolverStub = await proofProxy.deployed();

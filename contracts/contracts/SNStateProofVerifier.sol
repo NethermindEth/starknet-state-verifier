@@ -133,9 +133,6 @@ contract SNStateProofVerifier is
         uint256[] memory elems
     ) public view returns (uint256) {
         uint256[3] memory state = [uint256(0), uint256(0), uint256(0)];
-        // state[0] = Felt.Felt(0);
-        // state[1] = Felt.Felt(0);
-        // state[2] = Felt.Felt(0);
 
         for (uint256 i = 0; i < elems.length / 2; i++) {
             state[0] = (state[0] + elems[2 * i]) % BIG_PRIME;
@@ -148,7 +145,6 @@ contract SNStateProofVerifier is
             state[0] = (state[0] + elems[elems.length - 1]) % BIG_PRIME;
         }
         state[rem] = (state[rem] + (1)) % BIG_PRIME;
-        //hadesPermutation(state);
 
         return poseidon.poseidon(state)[0];
     }
@@ -238,11 +234,10 @@ contract SNStateProofVerifier is
             contractData.hashVersion
         );
 
-        uint256 storageVarValue = verifyProof(
+        uint256 storageVarValue = verifyStorageProof(
             contractData.contractStateRoot,
             contractData.storageVarAddress,
-            storageProofArray,
-            0 // there is no classCommitment required to verify the storage var proof
+            storageProofArray
         );
 
         require(
@@ -251,17 +246,17 @@ contract SNStateProofVerifier is
         );
 
         // the contract proof has to be verified against the state root committed on L1 in the Starknet Core Contract
-        // uint256 expectedStateHash = verifyProof(
-        //     starknetCoreContract.stateRoot(),
-        //     contractData.contractAddress,
-        //     contractProofArray,
-        //     classCommitment
-        // );
+        uint256 expectedStateHash = verifyProof(
+            starknetCoreContract.stateRoot(),
+            contractData.contractAddress,
+            contractProofArray,
+            classCommitment
+        );
 
-        // require(
-        //     _stateHash == expectedStateHash,
-        //     "hashes don't match. invalid states!"
-        // );
+        require(
+            _stateHash == expectedStateHash,
+            "hashes don't match. invalid states!"
+        );
         return storageVarValue;
     }
 
@@ -276,6 +271,16 @@ contract SNStateProofVerifier is
         uint256 aExtracted = ((a << msbitsToChopOff) >> msbitsToChopOff) >>
             (bitIndex - (length - 1));
         return aExtracted == b;
+    }
+
+    // overloaded/wrapper function around verifyProof, used to verify storage proof array where the class commitment does not apply
+    function verifyStorageProof(
+        uint256 rootHash,
+        uint256 path,
+        StarknetProof[] calldata proofArray
+    ) public view returns (uint256 value) {
+        // classCommitment is 0 means we are verifying storage proof array
+        return verifyProof(rootHash, path, proofArray, 0);
     }
 
     // A generic method to verify a proof against a root hash and a path.
@@ -349,7 +354,6 @@ contract SNStateProofVerifier is
                     expectedHash = proof.edgeProof.childHash;
                     int256 edgePathLength = int256(proof.edgeProof.length);
                     pathBitIndex -= edgePathLength;
-                    console.log("pathBitIndex", uint256(pathBitIndex));
                 }
             }
         }

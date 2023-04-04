@@ -21,6 +21,11 @@
               "type": "int256"
             },
             {
+              "internalType": "uint256",
+              "name": "classCommitment",
+              "type": "uint256"
+            },
+            {
               "components": [
                 {
                   "internalType": "uint256",

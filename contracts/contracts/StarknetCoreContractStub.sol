@@ -7,7 +7,7 @@ contract StarknetCoreContractStub {
         */
     function stateRoot() external view returns (uint256) {
         return
-            3336983124068735130152324162879243910192520110528667358095747281397777550026;
+            0x23e33e5a51995decf498722d12551830825c9c57ca1db2104e2217f954308a6;
     }
 
     /**

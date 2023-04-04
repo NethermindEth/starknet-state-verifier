@@ -77,22 +77,21 @@ describe("Verify", function () {
     try {
       const generatedPath = path.join(__dirname, "..", "generated");
 
+      //////////POSEIDON DEPLOYMENT
       const poseidonBytecodePath = path.join(generatedPath, `poseidon.bytecode`);
       const poseidonBytecode = fs.readFileSync(poseidonBytecodePath);
-
       const poseidonAbiPath = path.join(generatedPath, `poseidon.abi`);
       const poseidonAbi = fs.readFileSync(poseidonAbiPath);
-      console.log("poseidonAbi", poseidonAbi.toString());
       const Poseidon3 = new ethers.ContractFactory(
         poseidonAbi.toString(),
         poseidonBytecode.toString(),
         accounts[0]
       );
-
       const poseidon3 = await Poseidon3.deploy();
       await poseidon3.deployed();
       console.log("Poseidon3 contract has been deployed to: ", poseidon3.address);
 
+      //////////PEDERSEN DEPLOYMENT
       const PedersenHash = await ethers.getContractFactory("PedersenHash");
       pedersenHash = await PedersenHash.deploy(
         contracts.map((c: any) => c.address as string)
@@ -103,21 +102,21 @@ describe("Verify", function () {
         pedersenHash.address
       );
 
+      //////////StarknetCoreContract STUB DEPLOYMENT(ONLY FOR TESTING)
       const StarknetCoreContractStub = await ethers.getContractFactory(
         "StarknetCoreContractStub"
       );
       starknetCoreContractStub = await StarknetCoreContractStub.deploy();
       await starknetCoreContractStub.deployed();
-
       console.log(
         "StarknetCoreContractStub contract has been deployed to: ",
         starknetCoreContractStub.address
       );
 
+      //////////VERIFIER + L1 RESOLVER DEPLOYMENT (they are the same class)
       const SNResolverStub = await ethers.getContractFactory(
         "SNResolverStub"
       );
-
       const proofProxy = await upgrades.deployProxy(
         SNResolverStub,
         [pedersenHash.address, poseidon3.address, starknetCoreContractStub.address, ["https://localhost:9545/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
@@ -165,8 +164,8 @@ describe("Verify", function () {
     const contractAddress =
       "0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3";
     const storageVarAddress =
-      "0x778220fed180f06f58a2d1b21e63a28f5ff0703186c7a8c742fb64e85f98ab3";
-    const expectedStorageVarValue = "0x3392cfc52ca139634f457d7f0f83bc2d89baae2c8146f7527de07cdfb6e309";
+      "0x4b14f70a10d78816915e32a2bffa292270624cf4868f40cd489f78e2edc5bb4";
+    const expectedStorageVarValue = "3297450976341993905338014621774626109218148093827950687289193790013996697606";
     var result = await getVerifiedStorageValue(
       contractAddress,
       storageVarAddress,

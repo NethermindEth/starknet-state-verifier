@@ -59,6 +59,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
   // const [starknetStateRoot, setStarknetStateRoot] = useState('');
   const [storageProof, setStorageProof] = useState<StarknetProof[]>([]);
   const [contractProof, setContractProof] = useState<StarknetProof[]>([]);
+  const [classCommitment, setClassCommitment] = useState<BigNumberish>('');
 
   const [isLoading, setIsLoading] = useState(false);
   // const [blockNumber, setBlockNumber] = useState<string>();
@@ -74,6 +75,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
     functionName: "verifiedStorageValue",
     args: [
       starknetCommitmentBlockNumber,
+      classCommitment,
       contractData,
       contractProof,
       storageProof,
@@ -134,7 +136,7 @@ const VerifyProof: React.FC<Props> = (props: Props) => {
     }
 
     let parsedProof: StarknetCompositeStateProof = parseStarknetProof(proof, contractAddress, storageAddress, starknetCommitmentBlockNumber);
-
+    setClassCommitment(parsedProof.classCommitment);
     setContractProof(parsedProof.contractProofArray);
     setStorageProof(parsedProof.storageProofArray);
     setContractData(parsedProof.contractData);
