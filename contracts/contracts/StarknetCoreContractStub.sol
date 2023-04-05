@@ -7,13 +7,13 @@ contract StarknetCoreContractStub {
         */
     function stateRoot() external view returns (uint256) {
         return
-            0x23e33e5a51995decf498722d12551830825c9c57ca1db2104e2217f954308a6;
+            2793869633745137896926484933765493995916819896677591814984705621839603171245;
     }
 
     /**
         Returns the current block number.
         */
     function stateBlockNumber() external view returns (int256) {
-        return 787199;
+        return 789146;
     }
 }
