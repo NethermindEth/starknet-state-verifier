@@ -18,7 +18,14 @@ yarn install
 cp .env.example .env
 npx hardhat run <--network yournetwork > scripts/deploy.ts
 ```
-SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol. On goerli Pedersen hash contract is already deployed at 0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1 
+
+SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol and has been deployed to Goerli at 0xBB49c34D4d92aC3207d589657fAC14186a470116
+
+On goerli Pedersen hash contract is already deployed at 0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1
+
+Poseidon3(starkewares version) contracts EVM code has ben generated from the following repo and deployed on Goerli at 0x84d43a8cbEbF4F43863f399c34c06fC109c957a4.
+
+https://github.com/NethermindEth/circomlibjs/
 
 ## Run contract tests
 From the root folder run the following
@@ -60,4 +67,4 @@ Help taken from existing implementaion of optimism related solution at https://g
 
 
 # Disclaimer
-None of the contracts have been audited and shoud not be used in production.
+None of the contracts have been audited and should not be used in production.
