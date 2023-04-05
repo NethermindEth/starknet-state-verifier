@@ -58,7 +58,7 @@ Current implementation is already deployed for goerli at https://starknetens.ue.
 
 
 ## L2 Resolver
-L2 resolver is a git subtree of https://github.com/starknet-id/ens_resolver. This has been deployed to 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea on goerli
+This has been upgraded to cairo1 and deployed to 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea on goerli
 
 # Acknowledgements
 Pedersen Hash implementation has been borrowed from https://github.com/Kelvyne/starknet-storage-proof-solidity. Many Thanks!
