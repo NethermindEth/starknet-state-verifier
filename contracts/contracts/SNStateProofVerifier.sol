@@ -48,13 +48,8 @@ struct StarknetCompositeStateProof {
     StarknetProof[] storageProofArray;
 }
 
-interface IStarknetResolverService {
-    function addr(
-        bytes32 node
-    ) external view returns (StarknetCompositeStateProof memory proof);
-}
-
 interface PoseidonHash3 {
+    // this is the hades permutation function. TODO update the name when goerli eth is not so expensive
     function poseidon(
         uint256[3] calldata input
     ) external view returns (uint256[3] calldata);
@@ -129,6 +124,7 @@ contract SNStateProofVerifier is
         return hashvalue;
     }
 
+    // based on https://docs.starknet.io/documentation/architecture_and_concepts/Hashing/hash-functions/
     function poseidonHashMany(
         uint256[] memory elems
     ) public view returns (uint256) {

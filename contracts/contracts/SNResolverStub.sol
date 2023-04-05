@@ -9,6 +9,13 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
+// the gateway service will implement thhis interface. The gateway will be responsible for fetching the proof from the starknet network
+interface IStarknetResolverService {
+    function addr(
+        bytes32 node
+    ) external view returns (StarknetCompositeStateProof memory proof);
+}
+
 // Starknet Proof Verifier. This contract verifies a Starknet proof for a contract and a storage address/value
 contract SNResolverStub is SNStateProofVerifier, ERC165 {
     string[] public gateways;
