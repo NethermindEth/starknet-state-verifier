@@ -19,7 +19,7 @@ from starkware.cairo.common.poseidon_hash import poseidon_hash, poseidon_hash_ma
 
 print("pedersen_hash contract root ", hex(pedersen_hash(
     0xca8ac56bd313f8355dc40776427409f119924fe9067320fff8fd8765b766df, 0x7fb20da4f329a630f4bdfb75afae4ec93140da3a2527986c2cb7ee7361b9dea) ))
-print ('STARKNET_STATE_V0 to felt ', )
+print ('STARKNET_STATE_V0 to felt ',short_string_to_felt('STARKNET_STATE_V0') )
 print ("state commitment poseidon_hash_many ", hex(poseidon_hash_many([28355430774503553497671514844211693180464, 0x34894aedf9548524f9e5bb189472d25abe3c38befd577c90886a7c519e5eee4, 0x70c5acad61a421be9c2945b921e263f2699c668f20d31c90660e91b32ea99de])))
 
 # print("initializer ", get_storage_var_address('resolver'))
