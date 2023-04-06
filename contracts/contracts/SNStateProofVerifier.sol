@@ -51,8 +51,8 @@ struct StarknetCompositeStateProof {
 interface PoseidonHash3 {
     // this is the hades permutation function. TODO update the name when goerli eth is not so expensive
     function poseidon(
-        uint256[3] calldata input
-    ) external view returns (uint256[3] calldata);
+        uint256[3] memory input
+    ) external view returns (uint256[3] memory);
 }
 
 // Starknet Core Contract Minimal Interface
@@ -130,9 +130,9 @@ contract SNStateProofVerifier is
     ) public view returns (uint256) {
         uint256[3] memory state = [uint256(0), uint256(0), uint256(0)];
 
-        for (uint256 i = 0; i < elems.length / 2; i++) {
-            state[0] = (state[0] + elems[2 * i]) % BIG_PRIME;
-            state[1] = (state[1] + elems[2 * i + 1]) % BIG_PRIME;
+        for (uint256 i = 0; i < (elems.length - 1); i += 2) {
+            state[0] = (state[0] + elems[i]) % BIG_PRIME;
+            state[1] = (state[1] + elems[i + 1]) % BIG_PRIME;
             state = poseidon.poseidon(state);
         }
 
@@ -286,15 +286,14 @@ contract SNStateProofVerifier is
         StarknetProof[] calldata proofArray,
         uint256 classCommitment // 0 means no class commitment
     ) public view returns (uint256 value) {
+        require(
+            proofArray.length > 0,
+            "proof array must have atleast one element."
+        );
         uint256 expectedHash = rootHash;
         int256 pathBitIndex = 250; // start from the MSB bit index
         if (classCommitment > 0) {
             // https://docs.starknet.io/documentation/architecture_and_concepts/State/starknet-state/
-            require(
-                proofArray.length > 0,
-                "proofs must have atleast one element!"
-            );
-
             uint256 calculatedContractStateRoot = hashForSingleProofNode(
                 proofArray[0]
             ); // the hash of first element in the proof array is the contract state root
@@ -311,10 +310,6 @@ contract SNStateProofVerifier is
             // since we have already verified the first element in the proof array correctly hashes up to the state commitment, we can assume the hash of first element in the proof array is correct.
             expectedHash = calculatedContractStateRoot;
         }
-        require(
-            proofArray.length > 0,
-            "proof array must have atleast one element."
-        );
 
         bool isRight = true;
         for (uint256 i = 0; i < proofArray.length; i++) {
