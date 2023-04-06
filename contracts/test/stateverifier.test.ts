@@ -152,12 +152,23 @@ describe("Verify", function () {
     expect(resultFromStarknetVerifier.toString()).to.be.eq(result[0]);
   });
 
-  it(" test for a poseidon array", async function () {
+  it(" test1 for a poseidon array", async function () {
     const result = await l1resolverStub.poseidonHashMany(["28355430774503553497671514844211693180464", "0x34894aedf9548524f9e5bb189472d25abe3c38befd577c90886a7c519e5eee4", "0x70c5acad61a421be9c2945b921e263f2699c668f20d31c90660e91b32ea99de"]);
     console.log("Result: poseidon array ", result);
     expect(result).to.eq("0x7d608b218ca14fd5174b0fc40a9ea0c34bf7f855533323f348c47c9aa89fe90");
   });
 
+  it(" test2 for a poseidon array", async function () {
+    const result = await l1resolverStub.poseidonHashMany(["0", "0", "0"]);
+    console.log("Result: poseidon array ", result);
+    expect(result).to.eq("0x29aee7812642221479b7e8af204ceaa5a7b7e113349fc8fb93e6303b477eb4d");
+  });
+
+  it(" test3 for a poseidon array", async function () {
+    const result = await l1resolverStub.poseidonHashMany(["0", "0", "0", "100"]);
+    console.log("Result: poseidon array ", result);
+    expect(result).to.eq("0x8df36565336263d84db111ee02476ac7f921b517dd5b058a52ecb2f7ddf94d");
+  });
 
   it("it should verify the sampleproof1.json", async function () {
     var jsonFile = "./sampleProof1.json";
