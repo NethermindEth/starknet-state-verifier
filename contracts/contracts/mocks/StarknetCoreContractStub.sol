@@ -3,7 +3,7 @@ pragma solidity >=0.6.2 <0.9.0;
 /// ONLY FOR TESTING PURPOSES TO SIMULATE STARKNET CORE CONTRACT
 contract StarknetCoreContractStub {
     /**
-        Returns the current state root.
+        The stateroot is used by the tests. It is the stateroot of the starknet network at block 789146. All the sampleproofs in the test foldet should match up to this stateroot.
         */
     function stateRoot() external view returns (uint256) {
         return
@@ -11,7 +11,7 @@ contract StarknetCoreContractStub {
     }
 
     /**
-        Returns the current block number.
+        return the block number corresponding the stateroot above.
         */
     function stateBlockNumber() external view returns (int256) {
         return 789146;
