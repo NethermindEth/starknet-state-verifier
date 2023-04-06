@@ -5,6 +5,11 @@ import path from "path";
 
 dotenv.config();
 
+const PEDERSEN_ADDR_GOERLI = "0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1"; // pedersen already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
+const POSEIDON_ADDR_GOERLI = "0x84d43a8cbEbF4F43863f399c34c06fC109c957a4"; // poseidon already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
+const STARKNET_CORE_CONTRACT_ADDRESS_GOERLI = "0xde29d060D45901Fb19ED6C6e959EB22d8626708e"; // starknetcore contract address on goerli
+const L2_RESOLVER_ADDRESS = '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3' // L2 resolver contract address on starknet
+
 const deployTables = async () => {
   let precomputedContracts: any[64] = [];
   for (const i in new Array(64).fill(0)) {
@@ -72,11 +77,11 @@ const deployAll = async () => {
       const proofProxy = await upgrades.deployProxy(
         SNResolverStub,
         [
-          "0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1", // pedersen already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
-          "0x84d43a8cbEbF4F43863f399c34c06fC109c957a4", // poseidon already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
-          "0xde29d060D45901Fb19ED6C6e959EB22d8626708e", // starknetcore contract address on goerli
+          PEDERSEN_ADDR_GOERLI, // pedersen already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
+          POSEIDON_ADDR_GOERLI, // poseidon already deployed on goerli (goerli eth is expensive, cant do reployments all the time)
+          STARKNET_CORE_CONTRACT_ADDRESS_GOERLI, // starknetcore contract address on goerli
           ["https://starknetens.ue.r.appspot.com/{sender}/{data}.json"], // per https://eips.ethereum.org/EIPS/eip-3668  the sender and data populated by the client library like ethers.js with data returned by the CCIP enabled contract via revert
-          '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3' // L2 resolver contract address on starknet
+          L2_RESOLVER_ADDRESS // L2 resolver contract address on starknet
         ],
         {
           initializer: "initialize(address,address,address,string[],uint256)"
@@ -139,7 +144,7 @@ const deployAll = async () => {
       const proofProxy = await upgrades.deployProxy(
         SNResolverStub,
         [pedersenHash.address, poseidon3.address
-          , starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], '0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3'],
+          , starknetCoreContractStub.address, ["https://localhost:8080/{sender}/{data}.json"], L2_RESOLVER_ADDRESS],
         {
           initializer: "initialize(address,address,address,string[],uint256)"
         }
