@@ -19,7 +19,7 @@ cp .env.example .env
 npx hardhat run <--network yournetwork > scripts/deploy.ts
 ```
 
-SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol and has been deployed to Goerli at [0xBB49c34D4d92aC3207d589657fAC14186a470116](https://goerli.etherscan.io/address/0xBB49c34D4d92aC3207d589657fAC14186a470116)
+SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol and has been deployed to Goerli at [0xF1979Ec7Fc554e83cF722978Cf73AE94381fBD92](https://goerli.etherscan.io/address/0xF1979Ec7Fc554e83cF722978Cf73AE94381fBD92)
 
 On goerli Pedersen hash contract is already deployed at [0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1](https://goerli.etherscan.io/address/0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1)
 
