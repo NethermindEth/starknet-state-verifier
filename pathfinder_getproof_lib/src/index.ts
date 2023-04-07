@@ -29,6 +29,7 @@ export interface StarknetContractData {
 
 export interface StarknetCompositeStateProof {
   blockNumber: BigNumberish;
+  classCommitment: BigNumberish;
   contractData: StarknetContractData;
   contractProofArray: StarknetProof[];
   storageProofArray: StarknetProof[];
@@ -69,6 +70,7 @@ function parseProofElement(element: any): StarknetProof {
 export function parseStarknetProof(response: any, contractAddress: BigNumberish, storageVarAddress: BigNumberish, starknetCommittedBlockNumber: BigNumberish): StarknetCompositeStateProof {
   let myCompositeStateProof: StarknetCompositeStateProof = {
     blockNumber: 0,
+    classCommitment: 0,
     contractData: {
       contractStateRoot: 0,
       contractAddress: 0,
@@ -113,6 +115,7 @@ export function parseStarknetProof(response: any, contractAddress: BigNumberish,
         storageProofArray: myStorageproofs,
         contractData: StarknetContractData,
         blockNumber: starknetCommittedBlockNumber,
+        classCommitment: response.class_commitment
       }
     }
   }

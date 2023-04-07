@@ -18,7 +18,14 @@ yarn install
 cp .env.example .env
 npx hardhat run <--network yournetwork > scripts/deploy.ts
 ```
-SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol. On goerli Pedersen hash contract is already deployed at 0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1 
+
+SNL1ResolverStub.sol inherits from SNStateProofVerifier.sol and has been deployed to Goerli at [0xF1979Ec7Fc554e83cF722978Cf73AE94381fBD92](https://goerli.etherscan.io/address/0xF1979Ec7Fc554e83cF722978Cf73AE94381fBD92)
+
+On goerli Pedersen hash contract is already deployed at [0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1](https://goerli.etherscan.io/address/0x1a1eB562D2caB99959352E40a03B52C00ba7a5b1)
+
+Poseidon3(starkewares version) contracts EVM code has ben generated from the following repo and deployed on Goerli at [0x84d43a8cbEbF4F43863f399c34c06fC109c957a4](https://goerli.etherscan.io/address/0x84d43a8cbebf4f43863f399c34c06fc109c957a4).
+
+https://github.com/NethermindEth/circomlibjs/
 
 ## Run contract tests
 From the root folder run the following
@@ -33,7 +40,7 @@ REPORT_GAS=true npx hardhat test
 ```
 
 ## Build and deploy the gateway
-From the root folder run the following. L2/Starknet resolver is already deployed on goerli at 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea
+From the root folder run the following. L2/Starknet resolver is already deployed on goerli at [0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea](https://goerli.voyager.online/contract/0x07412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3#readContract)
 ```shell
 cd gateway
 yarn install
@@ -51,7 +58,7 @@ Current implementation is already deployed for goerli at https://starknetens.ue.
 
 
 ## L2 Resolver
-L2 resolver is a git subtree of https://github.com/starknet-id/ens_resolver. This has been deployed to 0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea on goerli
+This has been upgraded to cairo1 and deployed to [0x7412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea](https://goerli.voyager.online/contract/0x07412b9155cdb517c5d24e1c80f4af96f31f221151aab9a9a1b67f380a349ea3#readContract) on goerli
 
 # Acknowledgements
 Pedersen Hash implementation has been borrowed from https://github.com/Kelvyne/starknet-storage-proof-solidity. Many Thanks!
@@ -60,4 +67,4 @@ Help taken from existing implementaion of optimism related solution at https://g
 
 
 # Disclaimer
-None of the contracts have been audited and shoud not be used in production.
+None of the contracts have been audited and should not be used in production.

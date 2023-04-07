@@ -40,7 +40,7 @@
     "@chainlink/ccip-read-server": "^0.2.1",
     "eth-ens-namehash": "^2.0.8",
     "ethers": "^5.0.25",
-    "pathfinder_getproof_lib": "^0.0.3",
+    "pathfinder_getproof_lib": "^0.0.4",
     "starknet": "^4.17.1",
     "tsdx": "^0.14.1"
   }

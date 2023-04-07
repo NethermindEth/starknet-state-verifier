@@ -21,7 +21,7 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "framer-motion": "^7.6.19",
-    "pathfinder_getproof_lib": "^0.0.3",
+    "pathfinder_getproof_lib": "^0.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "starknet": "^4.9.0",
