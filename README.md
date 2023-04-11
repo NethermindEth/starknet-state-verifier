@@ -1,6 +1,6 @@
 # Resolve ENS names on l1 via starknet
 # Verify Starknet state/storage proofs in solidity. 
-This projects implements the verification of state/storage proofs for starknet on L1. We have built our custom contract(SNStateProofVerifier.sol) which verifies the state/storage proofs exported by pathfinder_getproof API. This repo utilizes a third party library/contract to calculate pedersen hashes(mentioned below) but implements custom verification and CCIP logic to enable ENS name resolution. . Frontend (ccip-helper.nethermind.io) app demonstrates the proof verification and ens resolution via starknet. Full details of this request flow can be found in EIP 3668.
+This projects implements the verification of state/storage proofs for starknet on L1. We have built our custom contract(SNStateProofVerifier.sol) which verifies the state/storage proofs exported by pathfinder_getproof API. This repo utilizes a third party library/contract to calculate pedersen hashes(mentioned below) but implements custom verification and CCIP logic to enable ENS name resolution. [Frontend](https://ccip-helper.nethermind.io) app demonstrates the proof verification and ens resolution via starknet. Full details of this request flow can be found in EIP 3668.
 
 ## Build and run UI Tool
 ```shell
