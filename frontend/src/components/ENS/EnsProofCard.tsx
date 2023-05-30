@@ -101,7 +101,7 @@ const EnsProofCard = () => {
           mutateProofCardState={mutateSetProofCardState}
           setState={setProofCardState}
         />
-        {proofCardState.proof && <JsonRpcResponse key={proofCardState.proof}
+        {proofCardState.proof && <JsonRpcResponse key={ proofCardState.contractAddress.concat(proofCardState.storageAddress)}
           data={proofCardState.proof}
           onResult={(proof: string) => mutateSetProofCardState("proof", proof)}
         />}
